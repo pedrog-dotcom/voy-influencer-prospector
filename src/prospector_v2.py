@@ -1,6 +1,6 @@
 """
-Módulo otimizado de prospecção de influenciadores.
-Versão 2.0 com estrutura correta das APIs.
+Módulo principal de prospecção de influenciadores.
+Versão 2.0 com suporte a Instagram (prioritário), TikTok e YouTube.
 """
 
 import sys
@@ -27,43 +27,117 @@ from config import (
     OUTPUT_FILE,
 )
 
+# Importar prospector do Instagram
+try:
+    from instagram_prospector import InstagramProspector, SEED_INFLUENCERS
+    INSTAGRAM_AVAILABLE = True
+except ImportError:
+    INSTAGRAM_AVAILABLE = False
+    SEED_INFLUENCERS = []
+
 logger = logging.getLogger(__name__)
 
 
 class InfluencerProspectorV2:
-    """Classe otimizada para prospecção de influenciadores."""
+    """Classe principal para prospecção de influenciadores multi-plataforma."""
     
     def __init__(self):
         """Inicializa o prospector."""
         self.history = HistoryManager()
         self.api_client = None
-        self._init_api_client()
+        self.instagram_prospector = None
+        self._init_api_clients()
         self.found_influencers: List[Influencer] = []
         self.errors: List[str] = []
         self.seen_usernames: Set[str] = set()
     
-    def _init_api_client(self):
-        """Inicializa o cliente de API."""
+    def _init_api_clients(self):
+        """Inicializa os clientes de API."""
+        # API Manus para TikTok e YouTube
         try:
             from data_api import ApiClient
             self.api_client = ApiClient()
-            logger.info("Cliente de API inicializado com sucesso")
+            logger.info("Cliente de API Manus inicializado")
         except ImportError as e:
             logger.warning(f"Não foi possível importar ApiClient: {e}")
             self.api_client = None
+        
+        # API do Instagram
+        if INSTAGRAM_AVAILABLE:
+            self.instagram_prospector = InstagramProspector()
+            if self.instagram_prospector.is_configured():
+                logger.info("Cliente de API Instagram inicializado")
+            else:
+                logger.warning("Instagram API não configurada (faltam credenciais)")
+                self.instagram_prospector = None
     
     def _rate_limit(self, delay: float = None):
         """Aplica rate limiting entre chamadas de API."""
         time.sleep(delay or API_RATE_LIMIT_DELAY)
     
+    def search_instagram(self, max_results: int = 20) -> List[Dict]:
+        """
+        Busca influenciadores no Instagram.
+        
+        Args:
+            max_results: Número máximo de resultados.
+            
+        Returns:
+            Lista de perfis encontrados.
+        """
+        if not self.instagram_prospector:
+            logger.info("Instagram API não disponível")
+            return []
+        
+        results = []
+        
+        try:
+            logger.info("Buscando no Instagram...")
+            
+            # Filtrar usernames já prospectados
+            available_usernames = [
+                u for u in SEED_INFLUENCERS
+                if not self.history.is_prospected(u, 'instagram')
+                and f"instagram:{u.lower()}" not in self.seen_usernames
+            ]
+            
+            if not available_usernames:
+                logger.warning("Todos os usernames da seed list já foram prospectados")
+                return results
+            
+            # Embaralhar para variar os resultados
+            random.shuffle(available_usernames)
+            
+            profiles = self.instagram_prospector.prospect_from_seed_list(
+                usernames=available_usernames[:max_results * 2],
+                min_followers=1000,
+                min_engagement=MIN_ENGAGEMENT_RATE,
+                max_results=max_results
+            )
+            
+            for profile in profiles:
+                profile_dict = self.instagram_prospector.to_dict(profile)
+                
+                # Verificar duplicatas
+                key = f"instagram:{profile.username.lower()}"
+                if key in self.seen_usernames:
+                    continue
+                self.seen_usernames.add(key)
+                
+                results.append(profile_dict)
+            
+            logger.info(f"Instagram: {len(results)} perfis encontrados")
+            
+        except Exception as e:
+            error_msg = f"Erro ao buscar no Instagram: {e}"
+            logger.error(error_msg)
+            self.errors.append(error_msg)
+        
+        return results
+    
     def search_tiktok(self, keyword: str, max_results: int = 20) -> List[Dict]:
         """
         Busca no TikTok e extrai informações dos autores.
-        
-        A estrutura da API é:
-        - data[].item.author (dados do autor)
-        - data[].item.stats (estatísticas do vídeo)
-        - data[].item.authorStats (estatísticas do autor)
         """
         if not self.api_client:
             return []
@@ -86,7 +160,6 @@ class InfluencerProspectorV2:
             videos = response.get('data', [])
             
             for video_data in videos[:max_results]:
-                # A estrutura correta é data[].item
                 item = video_data.get('item', {})
                 if not item:
                     continue
@@ -107,25 +180,22 @@ class InfluencerProspectorV2:
                 if self.history.is_prospected(unique_id, 'tiktok'):
                     continue
                 
-                # Extrair estatísticas do autor
+                # Extrair estatísticas
                 author_stats = item.get('authorStats', {})
                 followers = author_stats.get('followerCount', 0)
                 hearts = author_stats.get('heartCount', 0)
                 video_count = author_stats.get('videoCount', 0)
                 
-                # Estatísticas do vídeo
                 video_stats = item.get('stats', {})
                 likes = video_stats.get('diggCount', 0)
                 comments = video_stats.get('commentCount', 0)
                 plays = video_stats.get('playCount', 0)
                 
                 # Calcular engajamento
-                # Método 1: baseado em total de hearts / followers
                 if followers > 0 and video_count > 0:
                     avg_likes = hearts / video_count
                     engagement = (avg_likes / followers) * 100
                     engagement = min(engagement, 100)
-                # Método 2: baseado no vídeo atual
                 elif followers > 0:
                     engagement = ((likes + comments) / followers) * 100
                     engagement = min(engagement, 100)
@@ -145,8 +215,6 @@ class InfluencerProspectorV2:
                     'bio': author.get('signature', ''),
                     'url': f"https://www.tiktok.com/@{unique_id}",
                     'source_keyword': keyword,
-                    'total_hearts': hearts,
-                    'video_count': video_count,
                 })
             
             logger.info(f"TikTok: {len(results)} perfis para '{keyword}'")
@@ -189,26 +257,22 @@ class InfluencerProspectorV2:
                     if not channel_id:
                         continue
                     
-                    # Verificar duplicatas
                     key = f"youtube:{channel_id.lower()}"
                     if key in self.seen_usernames:
                         continue
                     self.seen_usernames.add(key)
                     
-                    # Verificar histórico
                     if self.history.is_prospected(channel_id, 'youtube'):
                         continue
                     
-                    # Extrair visualizações do vídeo
                     view_count = video.get('viewCountText', '0')
                     views = self._parse_count(view_count)
                     
-                    # Criar perfil
                     results.append({
                         'platform': 'youtube',
                         'username': channel_id,
                         'name': channel_title,
-                        'followers': 0,  # Não disponível na busca
+                        'followers': 0,
                         'engagement_rate': 0.0,
                         'avg_likes': 0,
                         'avg_comments': 0,
@@ -240,13 +304,7 @@ class InfluencerProspectorV2:
         text = text.lower().replace(' views', '').replace(' visualizações', '')
         text = text.replace(',', '.').strip()
         
-        multipliers = {
-            'k': 1_000,
-            'm': 1_000_000,
-            'mi': 1_000_000,
-            'mil': 1_000,
-            'b': 1_000_000_000,
-        }
+        multipliers = {'k': 1_000, 'm': 1_000_000, 'mi': 1_000_000, 'mil': 1_000, 'b': 1_000_000_000}
         
         for suffix, multiplier in multipliers.items():
             if suffix in text:
@@ -293,34 +351,60 @@ class InfluencerProspectorV2:
         return influencer
     
     def run_prospection(self, target_count: int = DAILY_PROSPECT_COUNT) -> ProspectionResult:
-        """Executa a prospecção diária."""
+        """
+        Executa a prospecção diária.
+        
+        Prioridade:
+        1. Instagram (prioritário)
+        2. TikTok
+        3. YouTube
+        """
         start_time = time.time()
         all_profiles: List[Dict] = []
         keywords_used: List[str] = []
         
         logger.info(f"Iniciando prospecção de {target_count} influenciadores")
         
-        # Selecionar keywords aleatórias
-        all_keywords = SEARCH_KEYWORDS_PT[:10] + SEARCH_KEYWORDS_EN[:5]
-        random.shuffle(all_keywords)
+        # 1. INSTAGRAM (Prioridade máxima)
+        instagram_target = min(target_count, 10)  # Até 10 do Instagram
+        instagram_profiles = self.search_instagram(max_results=instagram_target)
+        all_profiles.extend(instagram_profiles)
         
-        # Buscar até ter perfis suficientes
-        for keyword in all_keywords:
-            if len(all_profiles) >= target_count * 2:
-                break
+        # 2. TIKTOK
+        remaining = target_count - len([p for p in all_profiles if p.get('engagement_rate', 0) >= MIN_ENGAGEMENT_RATE])
+        
+        if remaining > 0:
+            tiktok_keywords = SEARCH_KEYWORDS_PT[:8] + SEARCH_KEYWORDS_EN[:4]
+            random.shuffle(tiktok_keywords)
             
-            keywords_used.append(keyword)
+            for keyword in tiktok_keywords:
+                if len(all_profiles) >= target_count * 2:
+                    break
+                
+                keywords_used.append(keyword)
+                tiktok_results = self.search_tiktok(keyword, max_results=10)
+                all_profiles.extend(tiktok_results)
+                
+                self._rate_limit(0.3)
+        
+        # 3. YOUTUBE
+        remaining = target_count - len([p for p in all_profiles if p.get('engagement_rate', 0) >= MIN_ENGAGEMENT_RATE])
+        
+        if remaining > 0:
+            youtube_keywords = SEARCH_KEYWORDS_PT[:5]
+            random.shuffle(youtube_keywords)
             
-            # Buscar no TikTok
-            tiktok_results = self.search_tiktok(keyword, max_results=15)
-            all_profiles.extend(tiktok_results)
-            
-            # Buscar no YouTube
-            youtube_results = self.search_youtube(keyword, max_results=10)
-            all_profiles.extend(youtube_results)
-            
-            # Pausa entre keywords
-            self._rate_limit(0.3)
+            for keyword in youtube_keywords:
+                if len(all_profiles) >= target_count * 2:
+                    break
+                
+                if keyword not in keywords_used:
+                    keywords_used.append(keyword)
+                
+                youtube_results = self.search_youtube(keyword, max_results=8)
+                all_profiles.extend(youtube_results)
+                
+                self._rate_limit(0.3)
         
         logger.info(f"Total de perfis encontrados: {len(all_profiles)}")
         
@@ -331,20 +415,22 @@ class InfluencerProspectorV2:
         
         logger.info(f"Qualificados: {len(qualified)}, Potenciais: {len(potential)}, Não verificados: {len(unverified)}")
         
-        # Ordenar por engajamento/seguidores
-        qualified.sort(key=lambda x: x.get('engagement_rate', 0), reverse=True)
+        # Ordenar - Instagram primeiro, depois por engajamento
+        def sort_key(p):
+            platform_priority = {'instagram': 0, 'tiktok': 1, 'youtube': 2}
+            return (platform_priority.get(p['platform'], 3), -p.get('engagement_rate', 0))
+        
+        qualified.sort(key=sort_key)
         potential.sort(key=lambda x: x.get('followers', 0), reverse=True)
         unverified.sort(key=lambda x: x.get('avg_views', 0), reverse=True)
         
         # Selecionar os melhores
         selected = qualified[:target_count]
         
-        # Completar com potenciais se necessário
         if len(selected) < target_count:
             remaining = target_count - len(selected)
             selected.extend(potential[:remaining])
         
-        # Completar com não verificados se necessário
         if len(selected) < target_count:
             remaining = target_count - len(selected)
             selected.extend(unverified[:remaining])
@@ -355,7 +441,6 @@ class InfluencerProspectorV2:
             influencer = self._convert_to_influencer(profile)
             influencers.append(influencer)
             
-            # Adicionar ao histórico
             self.history.add_prospected(
                 username=profile['username'],
                 platform=profile['platform'],
@@ -378,7 +463,6 @@ class InfluencerProspectorV2:
             errors=self.errors,
         )
         
-        # Registrar execução
         self.history.add_daily_run({
             'influencers_count': len(influencers),
             'total_found': len(all_profiles),
@@ -386,7 +470,6 @@ class InfluencerProspectorV2:
             'execution_time': execution_time,
         })
         
-        # Salvar resultado
         self._save_result(result)
         
         logger.info(f"Prospecção concluída: {len(influencers)} influenciadores em {execution_time:.2f}s")
@@ -426,6 +509,16 @@ def main():
     print(f"Influenciadores selecionados: {len(result.influencers)}")
     print(f"Tempo de execução: {result.execution_time_seconds:.2f}s")
     
+    # Contar por plataforma
+    platforms = {}
+    for inf in result.influencers:
+        p = inf.primary_platform.value
+        platforms[p] = platforms.get(p, 0) + 1
+    
+    print(f"\nPor plataforma:")
+    for p, count in sorted(platforms.items()):
+        print(f"  - {p.capitalize()}: {count}")
+    
     print("\n" + "-" * 60)
     print("INFLUENCIADORES:")
     print("-" * 60)
@@ -436,7 +529,7 @@ def main():
         followers = f"{profile.followers:,}" if profile else "N/A"
         engagement = f"{profile.engagement_rate}%" if profile else "N/A"
         
-        print(f"{i:2}. [{platform:7}] {inf.name[:30]:30} | "
+        print(f"{i:2}. [{platform:9}] {inf.name[:30]:30} | "
               f"Seg: {followers:>12} | Eng: {engagement:>7}")
         if profile:
             print(f"    URL: {profile.url}")

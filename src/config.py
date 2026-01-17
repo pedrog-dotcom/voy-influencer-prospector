@@ -86,3 +86,7 @@ PLATFORM_PRIORITY = {
 # Configurações de API
 API_RATE_LIMIT_DELAY = 1.0  # segundos entre chamadas de API
 MAX_RETRIES = 3
+
+# Configurações do Instagram (via variáveis de ambiente)
+# INSTAGRAM_ACCESS_TOKEN - Token de acesso da Graph API (longa duração)
+# INSTAGRAM_USER_ID - ID do usuário Instagram (página conectada)

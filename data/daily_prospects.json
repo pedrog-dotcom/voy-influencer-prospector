@@ -2,228 +2,203 @@
   "date": "2026-01-17",
   "influencers": [
     {
-      "name": "ComidasSaudaveis",
-      "primary_platform": "tiktok",
+      "name": "personaltrainerbr",
+      "primary_platform": "instagram",
       "profiles": [
         {
-          "platform": "tiktok",
-          "username": "comidas_saudaveiss_",
-          "url": "https://www.tiktok.com/@comidas_saudaveiss_",
-          "followers": 247,
-          "engagement_rate": 100,
-          "avg_likes": 296,
-          "avg_comments": 18,
-          "avg_views": 22400,
+          "platform": "instagram",
+          "username": "personaltrainerbr",
+          "url": "https://www.instagram.com/personaltrainerbr/",
+          "followers": 1858,
+          "engagement_rate": 2.99,
+          "avg_likes": 51,
+          "avg_comments": 4,
+          "avg_views": 0,
           "verified": false
         }
       ],
-      "bio": "Receitas, dicas e inspiração para uma vida mais saudável e equilibrada 🍎🥗",
+      "bio": "👨🏽‍🎓Prof. Educação Física | 💪🏽Fortalecimento |🦾Hipertrofia 🥵| Funcional 🤭Emagrecimento 👉🏽| Alongamento\n🪢Muay Thai🥊\nQualquer dúvida chamar no WhatsApp",
       "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 247,
-      "best_engagement_rate": 100,
-      "prospected_at": "2026-01-17T08:36:33.190980",
-      "source_keyword": "vida saudável",
+      "size": "nano",
+      "total_followers": 1858,
+      "best_engagement_rate": 2.99,
+      "prospected_at": "2026-01-17T09:04:50.517991",
+      "source_keyword": "seed_list",
       "notes": ""
     },
     {
-      "name": "Simplifica",
+      "name": "bia🌊",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "yasgui.shop",
-          "url": "https://www.tiktok.com/@yasgui.shop",
-          "followers": 10200,
+          "username": "bia_borgess__",
+          "url": "https://www.tiktok.com/@bia_borgess__",
+          "followers": 7366,
           "engagement_rate": 100,
-          "avg_likes": 35966,
-          "avg_comments": 500,
-          "avg_views": 897600,
+          "avg_likes": 18117,
+          "avg_comments": 27,
+          "avg_views": 244700,
           "verified": false
         }
       ],
-      "bio": "Produtos de qualidade!",
+      "bio": "Emagreci 8kg em 1 mês em casa💪🏻\nSite oficial do detox que eu tomo💊⤵️",
+      "niche": "emagrecimento",
+      "size": "nano",
+      "total_followers": 7366,
+      "best_engagement_rate": 100,
+      "prospected_at": "2026-01-17T09:04:50.518571",
+      "source_keyword": "emagrecimento",
+      "notes": ""
+    },
+    {
+      "name": "kelly_dhw",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "kelly_31079",
+          "url": "https://www.tiktok.com/@kelly_31079",
+          "followers": 138,
+          "engagement_rate": 100,
+          "avg_likes": 1270,
+          "avg_comments": 17,
+          "avg_views": 10500,
+          "verified": false
+        }
+      ],
+      "bio": "",
+      "niche": "emagrecimento",
+      "size": "small",
+      "total_followers": 138,
+      "best_engagement_rate": 100,
+      "prospected_at": "2026-01-17T09:04:50.518893",
+      "source_keyword": "perda de peso",
+      "notes": ""
+    },
+    {
+      "name": "Vitrine Shop",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "vitrine__shop",
+          "url": "https://www.tiktok.com/@vitrine__shop",
+          "followers": 4426,
+          "engagement_rate": 83.7,
+          "avg_likes": 3704,
+          "avg_comments": 11,
+          "avg_views": 39100,
+          "verified": false
+        }
+      ],
+      "bio": "garanta seus produtos agora.\nVitrine com ofertas 50% off👇",
+      "niche": "emagrecimento",
+      "size": "nano",
+      "total_followers": 4426,
+      "best_engagement_rate": 83.7,
+      "prospected_at": "2026-01-17T09:04:50.519532",
+      "source_keyword": "emagrecimento",
+      "notes": ""
+    },
+    {
+      "name": "nutri.yurimuller",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "nutri.yurimuller",
+          "url": "https://www.tiktok.com/@nutri.yurimuller",
+          "followers": 3109,
+          "engagement_rate": 60.33,
+          "avg_likes": 1875,
+          "avg_comments": 35,
+          "avg_views": 180500,
+          "verified": false
+        }
+      ],
+      "bio": "YURI MULLER | NUTRICIONISTA \n\nEQUILIBRE SUA ROTINA E SEU OBJETIVO 🚀",
+      "niche": "emagrecimento",
+      "size": "nano",
+      "total_followers": 3109,
+      "best_engagement_rate": 60.33,
+      "prospected_at": "2026-01-17T09:04:50.519988",
+      "source_keyword": "emagrecimento",
+      "notes": ""
+    },
+    {
+      "name": "Vicky Paiva",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "victoriapaivaa",
+          "url": "https://www.tiktok.com/@victoriapaivaa",
+          "followers": 10300,
+          "engagement_rate": 41.23,
+          "avg_likes": 4246,
+          "avg_comments": 142,
+          "avg_views": 146000,
+          "verified": false
+        }
+      ],
+      "bio": "✨ Autocuidado, vida leve e rotina de verdade ✨\nContato: vickypaivaa@gmail.com",
       "niche": "emagrecimento",
       "size": "micro",
-      "total_followers": 10200,
-      "best_engagement_rate": 100,
-      "prospected_at": "2026-01-17T08:36:33.191503",
-      "source_keyword": "vida saudável",
+      "total_followers": 10300,
+      "best_engagement_rate": 41.23,
+      "prospected_at": "2026-01-17T09:04:50.520412",
+      "source_keyword": "emagrecimento",
       "notes": ""
     },
     {
-      "name": "аминуля",
+      "name": "FoodHop",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "aminulkins",
-          "url": "https://www.tiktok.com/@aminulkins",
-          "followers": 81300,
-          "engagement_rate": 100,
-          "avg_likes": 240625,
-          "avg_comments": 14000,
-          "avg_views": 27600000,
+          "username": "fooodhopp",
+          "url": "https://www.tiktok.com/@fooodhopp",
+          "followers": 63,
+          "engagement_rate": 33.62,
+          "avg_likes": 21,
+          "avg_comments": 5,
+          "avg_views": 36200,
           "verified": false
         }
       ],
-      "bio": "Click the link below to know what help me to loose weight👇",
+      "bio": "just Ur favourite tiktok shitposter",
       "niche": "emagrecimento",
       "size": "small",
-      "total_followers": 81300,
-      "best_engagement_rate": 100,
-      "prospected_at": "2026-01-17T08:36:33.191797",
-      "source_keyword": "body transformation",
+      "total_followers": 63,
+      "best_engagement_rate": 33.62,
+      "prospected_at": "2026-01-17T09:04:50.520826",
+      "source_keyword": "overweight fitness",
       "notes": ""
     },
     {
-      "name": "Alyne",
+      "name": "Karla Sofía❀⋆｡˚",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "a.lynearrs",
-          "url": "https://www.tiktok.com/@a.lynearrs",
-          "followers": 51000,
-          "engagement_rate": 80.14,
-          "avg_likes": 40871,
-          "avg_comments": 2076,
-          "avg_views": 3700000,
+          "username": "karlasofia0603",
+          "url": "https://www.tiktok.com/@karlasofia0603",
+          "followers": 25900,
+          "engagement_rate": 28.57,
+          "avg_likes": 7400,
+          "avg_comments": 6143,
+          "avg_views": 17000000,
           "verified": false
         }
       ],
-      "bio": "Dicas úteis e saudáveis 😄🇧🇷",
+      "bio": "🫀\n444",
       "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 51000,
-      "best_engagement_rate": 80.14,
-      "prospected_at": "2026-01-17T08:36:33.192217",
-      "source_keyword": "vida saudável",
-      "notes": ""
-    },
-    {
-      "name": "Weight Loss Keto Coach",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "weightloss.keto.coach",
-          "url": "https://www.tiktok.com/@weightloss.keto.coach",
-          "followers": 78,
-          "engagement_rate": 44.93,
-          "avg_likes": 35,
-          "avg_comments": 18,
-          "avg_views": 39300,
-          "verified": false
-        }
-      ],
-      "bio": "21 LBS in 30 DAYS. Real Success Reviews💬 DM📩 me to get Keto Plan today🧑🏻‍⚕️",
-      "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 78,
-      "best_engagement_rate": 44.93,
-      "prospected_at": "2026-01-17T08:36:33.192531",
-      "source_keyword": "obesity transformation",
-      "notes": ""
-    },
-    {
-      "name": "Masha Jones",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "mbosfit",
-          "url": "https://www.tiktok.com/@mbosfit",
-          "followers": 80400,
-          "engagement_rate": 36.7,
-          "avg_likes": 29508,
-          "avg_comments": 5767,
-          "avg_views": 9300000,
-          "verified": false
-        }
-      ],
-      "bio": "Psalm 91\n-200lb down from my highest weight :)",
-      "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 80400,
-      "best_engagement_rate": 36.7,
-      "prospected_at": "2026-01-17T08:36:33.192971",
-      "source_keyword": "body transformation",
-      "notes": ""
-    },
-    {
-      "name": "Saúde360",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "360saude",
-          "url": "https://www.tiktok.com/@360saude",
-          "followers": 1424,
-          "engagement_rate": 34.42,
-          "avg_likes": 490,
-          "avg_comments": 92,
-          "avg_views": 347300,
-          "verified": false
-        }
-      ],
-      "bio": "Saúde, bem-estar e energia todos os dias.\nDicas simples para uma vida mais leve.  🌿✨",
-      "niche": "emagrecimento",
-      "size": "nano",
-      "total_followers": 1424,
-      "best_engagement_rate": 34.42,
-      "prospected_at": "2026-01-17T08:36:33.193299",
-      "source_keyword": "vida saudável",
-      "notes": ""
-    },
-    {
-      "name": "Pop curioso",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "pop.curioso2",
-          "url": "https://www.tiktok.com/@pop.curioso2",
-          "followers": 2837,
-          "engagement_rate": 26.51,
-          "avg_likes": 752,
-          "avg_comments": 182,
-          "avg_views": 496000,
-          "verified": false
-        }
-      ],
-      "bio": "👀 O lado secreto da fama\n⭐ Curiosidades dos famosos\n📲 Conteúdo diário",
-      "niche": "emagrecimento",
-      "size": "nano",
-      "total_followers": 2837,
-      "best_engagement_rate": 26.51,
-      "prospected_at": "2026-01-17T08:36:33.193569",
-      "source_keyword": "antes e depois",
-      "notes": ""
-    },
-    {
-      "name": "Seque com Saúde💪🏻✨😍",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "sequecomsaude2",
-          "url": "https://www.tiktok.com/@sequecomsaude2",
-          "followers": 67,
-          "engagement_rate": 25.53,
-          "avg_likes": 17,
-          "avg_comments": 2,
-          "avg_views": 1634,
-          "verified": false
-        }
-      ],
-      "bio": "🍎 Emagreça com saúde e prazer!\n💪 Diga adeus ao efeito sanfona\n📘 \"Seque com Saúde!”\nComece hoje sua transformação!✨",
-      "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 67,
-      "best_engagement_rate": 25.53,
-      "prospected_at": "2026-01-17T08:36:33.194218",
-      "source_keyword": "vida saudável",
+      "size": "micro",
+      "total_followers": 25900,
+      "best_engagement_rate": 28.57,
+      "prospected_at": "2026-01-17T09:04:50.521274",
+      "source_keyword": "perda de peso",
       "notes": ""
     },
     {
@@ -247,133 +222,58 @@
       "size": "medium",
       "total_followers": 481700,
       "best_engagement_rate": 22.84,
-      "prospected_at": "2026-01-17T08:36:33.194851",
+      "prospected_at": "2026-01-17T09:04:50.521710",
       "source_keyword": "obesity transformation",
       "notes": ""
     },
     {
-      "name": "richardzoumalan.md",
+      "name": "toquio.us",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "richardzoumalan",
-          "url": "https://www.tiktok.com/@richardzoumalan",
-          "followers": 2000000,
-          "engagement_rate": 22.76,
-          "avg_likes": 455244,
-          "avg_comments": 772,
-          "avg_views": 4000000,
-          "verified": true
-        }
-      ],
-      "bio": "Art that Breathes \nMore on my IG",
-      "niche": "emagrecimento",
-      "size": "mega",
-      "total_followers": 2000000,
-      "best_engagement_rate": 22.76,
-      "prospected_at": "2026-01-17T08:36:33.195214",
-      "source_keyword": "antes e depois",
-      "notes": ""
-    },
-    {
-      "name": "SoldatVk",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "soldat_vk",
-          "url": "https://www.tiktok.com/@soldat_vk",
-          "followers": 14900,
-          "engagement_rate": 17.25,
-          "avg_likes": 2570,
-          "avg_comments": 107,
-          "avg_views": 144700,
+          "username": "toquio.usa",
+          "url": "https://www.tiktok.com/@toquio.usa",
+          "followers": 82500,
+          "engagement_rate": 16.66,
+          "avg_likes": 13744,
+          "avg_comments": 36,
+          "avg_views": 24900,
           "verified": false
         }
       ],
-      "bio": "animações furiosas 😁",
+      "bio": "👇Join the course today!💰and learn how to earn money with AI!🚀",
+      "niche": "emagrecimento",
+      "size": "small",
+      "total_followers": 82500,
+      "best_engagement_rate": 16.66,
+      "prospected_at": "2026-01-17T09:04:50.522158",
+      "source_keyword": "perda de peso",
+      "notes": ""
+    },
+    {
+      "name": "SECANDO COM LIPEDEMA",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "dailycorpoinflamado",
+          "url": "https://www.tiktok.com/@dailycorpoinflamado",
+          "followers": 22400,
+          "engagement_rate": 16.38,
+          "avg_likes": 3668,
+          "avg_comments": 35,
+          "avg_views": 161600,
+          "verified": false
+        }
+      ],
+      "bio": "Meta: um corpo slim 🔥 vamos secar juntas? \n👇🏻 SITE OFICIAL (ORIGINAL) 👇🏻",
       "niche": "emagrecimento",
       "size": "micro",
-      "total_followers": 14900,
-      "best_engagement_rate": 17.25,
-      "prospected_at": "2026-01-17T08:36:33.195521",
-      "source_keyword": "vida saudável",
-      "notes": ""
-    },
-    {
-      "name": "Seekah Lytess",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "seekahlytess",
-          "url": "https://www.tiktok.com/@seekahlytess",
-          "followers": 119400,
-          "engagement_rate": 15.91,
-          "avg_likes": 19000,
-          "avg_comments": 3215,
-          "avg_views": 6300000,
-          "verified": false
-        }
-      ],
-      "bio": "Message me privately for prices on personalised songs catered to you!",
-      "niche": "emagrecimento",
-      "size": "medium",
-      "total_followers": 119400,
-      "best_engagement_rate": 15.91,
-      "prospected_at": "2026-01-17T08:36:33.195818",
-      "source_keyword": "body transformation",
-      "notes": ""
-    },
-    {
-      "name": "Fit Dicas Deliciosas",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "fitdicasdeliciosas",
-          "url": "https://www.tiktok.com/@fitdicasdeliciosas",
-          "followers": 1332,
-          "engagement_rate": 14.88,
-          "avg_likes": 198,
-          "avg_comments": 10,
-          "avg_views": 25600,
-          "verified": false
-        }
-      ],
-      "bio": "Dicas e receitas fitness deliciosas para transformar sua alimentação com saúde🥗",
-      "niche": "emagrecimento",
-      "size": "nano",
-      "total_followers": 1332,
-      "best_engagement_rate": 14.88,
-      "prospected_at": "2026-01-17T08:36:33.196142",
-      "source_keyword": "vida saudável",
-      "notes": ""
-    },
-    {
-      "name": "Coach Alex",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "alexreedcoaching",
-          "url": "https://www.tiktok.com/@alexreedcoaching",
-          "followers": 13200,
-          "engagement_rate": 13.48,
-          "avg_likes": 1780,
-          "avg_comments": 4,
-          "avg_views": 16000,
-          "verified": false
-        }
-      ],
-      "bio": "Click below for coaching 👇",
-      "niche": "emagrecimento",
-      "size": "micro",
-      "total_followers": 13200,
-      "best_engagement_rate": 13.48,
-      "prospected_at": "2026-01-17T08:36:33.196517",
-      "source_keyword": "obesity transformation",
+      "total_followers": 22400,
+      "best_engagement_rate": 16.38,
+      "prospected_at": "2026-01-17T09:04:50.522634",
+      "source_keyword": "perda de peso",
       "notes": ""
     },
     {
@@ -397,33 +297,8 @@
       "size": "nano",
       "total_followers": 3803,
       "best_engagement_rate": 12.96,
-      "prospected_at": "2026-01-17T08:36:33.196885",
+      "prospected_at": "2026-01-17T09:04:50.523215",
       "source_keyword": "obesity transformation",
-      "notes": ""
-    },
-    {
-      "name": "SS7",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "ss7edits_",
-          "url": "https://www.tiktok.com/@ss7edits_",
-          "followers": 116100,
-          "engagement_rate": 12.76,
-          "avg_likes": 14814,
-          "avg_comments": 5822,
-          "avg_views": 28500000,
-          "verified": false
-        }
-      ],
-      "bio": "follow for more \n☝️☝️☝️☝️\nCRA58EJE",
-      "niche": "emagrecimento",
-      "size": "medium",
-      "total_followers": 116100,
-      "best_engagement_rate": 12.76,
-      "prospected_at": "2026-01-17T08:36:33.197271",
-      "source_keyword": "antes e depois",
       "notes": ""
     },
     {
@@ -437,8 +312,8 @@
           "followers": 84300,
           "engagement_rate": 11.86,
           "avg_likes": 10000,
-          "avg_comments": 2252,
-          "avg_views": 8000000,
+          "avg_comments": 4213,
+          "avg_views": 9900000,
           "verified": false
         }
       ],
@@ -447,70 +322,194 @@
       "size": "small",
       "total_followers": 84300,
       "best_engagement_rate": 11.86,
-      "prospected_at": "2026-01-17T08:36:33.197746",
-      "source_keyword": "body transformation",
+      "prospected_at": "2026-01-17T09:04:50.523727",
+      "source_keyword": "perda de peso",
       "notes": ""
     },
     {
-      "name": "Farma_Oz",
+      "name": "sciencebyte",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "farma_oz",
-          "url": "https://www.tiktok.com/@farma_oz",
-          "followers": 194,
-          "engagement_rate": 11.33,
-          "avg_likes": 21,
-          "avg_comments": 10,
-          "avg_views": 10000,
+          "username": "inspirescience",
+          "url": "https://www.tiktok.com/@inspirescience",
+          "followers": 4376,
+          "engagement_rate": 9.32,
+          "avg_likes": 408,
+          "avg_comments": 26,
+          "avg_views": 58900,
           "verified": false
         }
       ],
-      "bio": "Ciência + farmácia + pele saudável\nsuplementos, rotina de skincare",
+      "bio": "Follow me to learn more interesting things!",
       "niche": "emagrecimento",
-      "size": "small",
-      "total_followers": 194,
-      "best_engagement_rate": 11.33,
-      "prospected_at": "2026-01-17T08:36:33.198129",
-      "source_keyword": "vida saudável",
+      "size": "nano",
+      "total_followers": 4376,
+      "best_engagement_rate": 9.32,
+      "prospected_at": "2026-01-17T09:04:50.524277",
+      "source_keyword": "obesity transformation",
       "notes": ""
     },
     {
-      "name": "Carolzinha 🩻",
+      "name": "Moriah Jade",
       "primary_platform": "tiktok",
       "profiles": [
         {
           "platform": "tiktok",
-          "username": "carolzinha_saad",
-          "url": "https://www.tiktok.com/@carolzinha_saad",
-          "followers": 27800,
-          "engagement_rate": 10.45,
-          "avg_likes": 2904,
-          "avg_comments": 196,
-          "avg_views": 1200000,
+          "username": "moriahlicious",
+          "url": "https://www.tiktok.com/@moriahlicious",
+          "followers": 1379,
+          "engagement_rate": 9.06,
+          "avg_likes": 125,
+          "avg_comments": 16,
+          "avg_views": 24700,
           "verified": false
         }
       ],
-      "bio": "OI MIGUXASS\nA mais legal 🤠\n\"daily\": @carolixoslife\n💄🛍️💋\n⬇️TUDO AQUI⬇️",
+      "bio": "✨ 26 |  💕",
+      "niche": "emagrecimento",
+      "size": "nano",
+      "total_followers": 1379,
+      "best_engagement_rate": 9.06,
+      "prospected_at": "2026-01-17T09:04:50.524874",
+      "source_keyword": "overweight fitness",
+      "notes": ""
+    },
+    {
+      "name": "Our Green Planet 🌎",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "greenplanet.official",
+          "url": "https://www.tiktok.com/@greenplanet.official",
+          "followers": 43200,
+          "engagement_rate": 8.48,
+          "avg_likes": 3661,
+          "avg_comments": 59,
+          "avg_views": 234100,
+          "verified": false
+        }
+      ],
+      "bio": "sharing interesting  phobia videos everyday",
       "niche": "emagrecimento",
       "size": "micro",
-      "total_followers": 27800,
-      "best_engagement_rate": 10.45,
-      "prospected_at": "2026-01-17T08:36:33.198470",
-      "source_keyword": "antes e depois",
+      "total_followers": 43200,
+      "best_engagement_rate": 8.48,
+      "prospected_at": "2026-01-17T09:04:50.525636",
+      "source_keyword": "obesity transformation",
+      "notes": ""
+    },
+    {
+      "name": "Jahna 🦂",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "hipssdontliebuttheyhurt",
+          "url": "https://www.tiktok.com/@hipssdontliebuttheyhurt",
+          "followers": 26200,
+          "engagement_rate": 8.48,
+          "avg_likes": 2222,
+          "avg_comments": 11,
+          "avg_views": 29300,
+          "verified": false
+        }
+      ],
+      "bio": "Healing my relationship with food, movement, and myself. -35lbs\n💌 heyjahna@gmail.com\nmy trusted source for GLP1 👇🏼\nUse code JA20",
+      "niche": "emagrecimento",
+      "size": "micro",
+      "total_followers": 26200,
+      "best_engagement_rate": 8.48,
+      "prospected_at": "2026-01-17T09:04:50.526143",
+      "source_keyword": "overweight fitness",
+      "notes": ""
+    },
+    {
+      "name": "Gym2324",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "vinhtaybac3",
+          "url": "https://www.tiktok.com/@vinhtaybac3",
+          "followers": 74600,
+          "engagement_rate": 8.19,
+          "avg_likes": 6111,
+          "avg_comments": 11500,
+          "avg_views": 13000000,
+          "verified": false
+        }
+      ],
+      "bio": "",
+      "niche": "emagrecimento",
+      "size": "small",
+      "total_followers": 74600,
+      "best_engagement_rate": 8.19,
+      "prospected_at": "2026-01-17T09:04:50.526602",
+      "source_keyword": "overweight fitness",
+      "notes": ""
+    },
+    {
+      "name": "Leah Hope",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "leahhopehealth",
+          "url": "https://www.tiktok.com/@leahhopehealth",
+          "followers": 434000,
+          "engagement_rate": 7.55,
+          "avg_likes": 32751,
+          "avg_comments": 13000,
+          "avg_views": 38800000,
+          "verified": false
+        }
+      ],
+      "bio": "⬇️ 215lbs!\nNot chasing a smaller body, but a bigger life!\n👇🏻 My guide",
+      "niche": "emagrecimento",
+      "size": "medium",
+      "total_followers": 434000,
+      "best_engagement_rate": 7.55,
+      "prospected_at": "2026-01-17T09:04:50.527167",
+      "source_keyword": "obesity transformation",
+      "notes": ""
+    },
+    {
+      "name": "AbuBurhan Store",
+      "primary_platform": "tiktok",
+      "profiles": [
+        {
+          "platform": "tiktok",
+          "username": "abuburhan.store",
+          "url": "https://www.tiktok.com/@abuburhan.store",
+          "followers": 225,
+          "engagement_rate": 7.13,
+          "avg_likes": 16,
+          "avg_comments": 46,
+          "avg_views": 27700,
+          "verified": false
+        }
+      ],
+      "bio": "What's app order Karne k liye \n0301-9476298\n0317-6282482",
+      "niche": "emagrecimento",
+      "size": "small",
+      "total_followers": 225,
+      "best_engagement_rate": 7.13,
+      "prospected_at": "2026-01-17T09:04:50.527585",
+      "source_keyword": "perda de peso",
       "notes": ""
     }
   ],
-  "total_found": 46,
-  "total_qualified": 40,
+  "total_found": 42,
+  "total_qualified": 30,
   "keywords_used": [
-    "vida saudável",
     "obesity transformation",
-    "weight loss journey",
-    "antes e depois",
-    "body transformation"
+    "overweight fitness",
+    "emagrecimento",
+    "perda de peso"
   ],
-  "execution_time_seconds": 21.95,
+  "execution_time_seconds": 27.53,
   "errors": []
 }
