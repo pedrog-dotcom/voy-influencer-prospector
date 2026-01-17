@@ -424,7 +424,8 @@ class InfluencerProspector:
     def _filter_qualified_profiles(
         self, 
         profiles: List[Dict], 
-        min_engagement: float = MIN_ENGAGEMENT_RATE
+        min_engagement: float = MIN_ENGAGEMENT_RATE,
+        include_unverified: bool = True
     ) -> List[Dict]:
         """
         Filtra perfis que atendem aos critérios mínimos.
@@ -432,6 +433,7 @@ class InfluencerProspector:
         Args:
             profiles: Lista de perfis.
             min_engagement: Taxa mínima de engajamento.
+            include_unverified: Incluir perfis sem dados de engajamento.
             
         Returns:
             Lista de perfis qualificados.
@@ -439,11 +441,21 @@ class InfluencerProspector:
         qualified = []
         
         for profile in profiles:
+            engagement = profile.get('engagement_rate', 0)
+            followers = profile.get('followers', 0)
+            
             # Verificar engajamento
-            if profile.get('engagement_rate', 0) >= min_engagement:
+            if engagement >= min_engagement:
+                profile['qualification_status'] = 'qualified'
                 qualified.append(profile)
-            # Se não temos dados de engajamento, incluir para verificação manual
-            elif profile.get('engagement_rate', 0) == 0 and profile.get('followers', 0) > 1000:
+            # Se não temos dados de engajamento mas tem seguidores, incluir para verificação
+            elif include_unverified and engagement == 0 and followers >= 1000:
+                profile['qualification_status'] = 'needs_verification'
+                profile['needs_verification'] = True
+                qualified.append(profile)
+            # Incluir perfis com engajamento baixo mas significativo número de seguidores
+            elif followers >= 10000 and engagement > 0:
+                profile['qualification_status'] = 'potential'
                 profile['needs_verification'] = True
                 qualified.append(profile)
         

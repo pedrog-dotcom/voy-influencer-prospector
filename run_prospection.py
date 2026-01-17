@@ -9,20 +9,20 @@ Uso:
 Opções:
     --count N           Número de influenciadores a prospectar (padrão: 20)
     --output-format     Formato de saída: json, csv, markdown (padrão: json)
-    --dry-run           Executa sem salvar no histórico
 """
 
 import sys
 import argparse
 import json
 import csv
+import logging
 from pathlib import Path
 from datetime import datetime
 
 # Adicionar diretório src ao path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from prospector import InfluencerProspector
+from prospector_v2 import InfluencerProspectorV2
 from models import ProspectionResult
 from config import DATA_DIR, DAILY_PROSPECT_COUNT
 
@@ -45,6 +45,7 @@ def export_to_csv(result: ProspectionResult, output_path: Path):
             'Bio',
             'Palavra-chave Fonte',
             'Data Prospecção',
+            'Notas',
         ])
         
         # Dados
@@ -62,6 +63,7 @@ def export_to_csv(result: ProspectionResult, output_path: Path):
                 influencer.bio[:100] if influencer.bio else '',
                 influencer.source_keyword,
                 influencer.prospected_at,
+                influencer.notes,
             ])
 
 
@@ -74,13 +76,28 @@ def export_to_markdown(result: ProspectionResult, output_path: Path):
         "",
         f"- **Data:** {result.date}",
         f"- **Total encontrados:** {result.total_found}",
-        f"- **Total qualificados:** {result.total_qualified}",
+        f"- **Total qualificados (engajamento >= 2.5%):** {result.total_qualified}",
         f"- **Selecionados:** {len(result.influencers)}",
         f"- **Tempo de execução:** {result.execution_time_seconds:.2f}s",
         "",
         "## Influenciadores Prospectados",
         "",
+        "| # | Nome | Plataforma | Username | Seguidores | Engajamento | URL |",
+        "|---|------|------------|----------|------------|-------------|-----|",
     ]
+    
+    for i, influencer in enumerate(result.influencers, 1):
+        profile = influencer.profiles[0] if influencer.profiles else None
+        if profile:
+            lines.append(
+                f"| {i} | {influencer.name[:25]} | {influencer.primary_platform.value} | "
+                f"@{profile.username[:15]} | {profile.followers:,} | "
+                f"{profile.engagement_rate}% | [Link]({profile.url}) |"
+            )
+    
+    lines.append("")
+    lines.append("## Detalhes")
+    lines.append("")
     
     for i, influencer in enumerate(result.influencers, 1):
         profile = influencer.profiles[0] if influencer.profiles else None
@@ -88,20 +105,23 @@ def export_to_markdown(result: ProspectionResult, output_path: Path):
         lines.extend([
             f"### {i}. {influencer.name}",
             "",
-            f"- **Plataforma:** {influencer.primary_platform.value.capitalize()}",
         ])
         
         if profile:
             lines.extend([
+                f"- **Plataforma:** {influencer.primary_platform.value.capitalize()}",
                 f"- **Username:** @{profile.username}",
-                f"- **URL:** [{profile.url}]({profile.url})",
+                f"- **URL:** {profile.url}",
                 f"- **Seguidores:** {profile.followers:,}",
                 f"- **Taxa de Engajamento:** {profile.engagement_rate}%",
                 f"- **Verificado:** {'Sim' if profile.verified else 'Não'}",
             ])
         
         if influencer.bio:
-            lines.append(f"- **Bio:** {influencer.bio[:200]}...")
+            lines.append(f"- **Bio:** {influencer.bio[:200]}")
+        
+        if influencer.notes:
+            lines.append(f"- **Notas:** {influencer.notes}")
         
         lines.append("")
     
@@ -136,12 +156,19 @@ def main():
         help='Formato de saída (padrão: json)'
     )
     parser.add_argument(
-        '--dry-run',
+        '--verbose',
         action='store_true',
-        help='Executa sem salvar no histórico'
+        help='Modo verboso com mais detalhes'
     )
     
     args = parser.parse_args()
+    
+    # Configurar logging
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
     
     print("=" * 60)
     print("VOY SAÚDE - PROSPECÇÃO DE INFLUENCIADORES")
@@ -153,7 +180,7 @@ def main():
     print()
     
     # Executar prospecção
-    prospector = InfluencerProspector()
+    prospector = InfluencerProspectorV2()
     result = prospector.run_prospection(target_count=args.count)
     
     # Garantir diretório de saída
@@ -193,17 +220,19 @@ def main():
     
     print()
     print("-" * 60)
-    print("TOP 10 INFLUENCIADORES:")
+    print("INFLUENCIADORES PROSPECTADOS:")
     print("-" * 60)
     
-    for i, influencer in enumerate(result.influencers[:10], 1):
+    for i, influencer in enumerate(result.influencers, 1):
         profile = influencer.profiles[0] if influencer.profiles else None
         platform = influencer.primary_platform.value.upper()
         followers = f"{profile.followers:,}" if profile else "N/A"
         engagement = f"{profile.engagement_rate}%" if profile else "N/A"
         
         print(f"{i:2}. [{platform:7}] {influencer.name[:30]:30} | "
-              f"Seg: {followers:>10} | Eng: {engagement:>6}")
+              f"Seg: {followers:>12} | Eng: {engagement:>7}")
+        if profile:
+            print(f"    URL: {profile.url}")
     
     print()
     print("=" * 60)
