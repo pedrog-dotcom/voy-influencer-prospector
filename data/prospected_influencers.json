@@ -159,29 +159,65 @@
       "prospected_at": "2026-01-17T09:04:50.527595",
       "engagement_rate": 7.13,
       "followers": 225
+    },
+    "instagram:jejumintermitente": {
+      "username": "jejumintermitente",
+      "platform": "instagram",
+      "name": "jejumintermitente",
+      "prospected_at": "2026-01-17T14:28:02.299857",
+      "engagement_rate": 0.04,
+      "followers": 1227634
+    },
+    "instagram:antesedepoisreal": {
+      "username": "antesedepoisreal",
+      "platform": "instagram",
+      "name": "antesedepoisreal",
+      "prospected_at": "2026-01-17T14:28:02.300361",
+      "engagement_rate": 0.25,
+      "followers": 220187
+    },
+    "instagram:dietaflexivel": {
+      "username": "dietaflexivel",
+      "platform": "instagram",
+      "name": "dietaflexivel",
+      "prospected_at": "2026-01-17T14:28:02.300910",
+      "engagement_rate": 0.38,
+      "followers": 38556
+    },
+    "instagram:transformacao": {
+      "username": "transformacao",
+      "platform": "instagram",
+      "name": "transformacao",
+      "prospected_at": "2026-01-17T14:28:02.301438",
+      "engagement_rate": 0.03,
+      "followers": 16400
     }
   },
   "prospected_names": [
-    "leah hope",
-    "vitrine shop",
-    "my600lblifewess",
-    "moriah jade",
-    "our green planet 🌎",
-    "abuburhan store",
-    "bia🌊",
-    "secando com lipedema",
-    "bigdoggmerdo",
     "foodhop",
-    "personaltrainerbr",
+    "antesedepoisreal",
+    "leah hope",
+    "secando com lipedema",
+    "bia🌊",
     "karla sofía❀⋆｡˚",
-    "jahna 🦂",
-    "nutri.yurimuller",
-    "vicky paiva",
-    "kelly_dhw",
-    "gym2324",
+    "moriah jade",
+    "vitrine shop",
+    "our green planet 🌎",
     "sciencebyte",
+    "nutri.yurimuller",
+    "gym2324",
+    "vicky paiva",
+    "transformacao",
     "forward medicine🧬",
-    "toquio.us"
+    "toquio.us",
+    "bigdoggmerdo",
+    "kelly_dhw",
+    "personaltrainerbr",
+    "my600lblifewess",
+    "jejumintermitente",
+    "jahna 🦂",
+    "abuburhan store",
+    "dietaflexivel"
   ],
   "daily_runs": [
     {
@@ -191,7 +227,15 @@
       "total_found": 42,
       "total_qualified": 30,
       "execution_time": 27.53093457221985
+    },
+    {
+      "date": "2026-01-17",
+      "timestamp": "2026-01-17T14:28:02.302066",
+      "influencers_count": 8,
+      "total_found": 4,
+      "total_qualified": 0,
+      "execution_time": 25.765594244003296
     }
   ],
-  "last_updated": "2026-01-17T09:04:50.528194"
+  "last_updated": "2026-01-17T14:28:02.302182"
 }
