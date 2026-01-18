@@ -191,33 +191,42 @@
       "prospected_at": "2026-01-17T14:28:02.301438",
       "engagement_rate": 0.03,
       "followers": 16400
+    },
+    "instagram:bemestar": {
+      "username": "bemestar",
+      "platform": "instagram",
+      "name": "bemestar",
+      "prospected_at": "2026-01-18T13:37:42.845165",
+      "engagement_rate": 0.09,
+      "followers": 1235130
     }
   },
   "prospected_names": [
-    "foodhop",
-    "antesedepoisreal",
-    "leah hope",
-    "secando com lipedema",
-    "bia🌊",
-    "karla sofía❀⋆｡˚",
     "moriah jade",
-    "vitrine shop",
+    "vicky paiva",
+    "bigdoggmerdo",
+    "jahna 🦂",
+    "toquio.us",
+    "transformacao",
+    "my600lblifewess",
+    "karla sofía❀⋆｡˚",
+    "forward medicine🧬",
+    "secando com lipedema",
+    "foodhop",
     "our green planet 🌎",
     "sciencebyte",
     "nutri.yurimuller",
-    "gym2324",
-    "vicky paiva",
-    "transformacao",
-    "forward medicine🧬",
-    "toquio.us",
-    "bigdoggmerdo",
-    "kelly_dhw",
-    "personaltrainerbr",
-    "my600lblifewess",
-    "jejumintermitente",
-    "jahna 🦂",
+    "antesedepoisreal",
+    "dietaflexivel",
+    "vitrine shop",
     "abuburhan store",
-    "dietaflexivel"
+    "personaltrainerbr",
+    "kelly_dhw",
+    "bia🌊",
+    "gym2324",
+    "jejumintermitente",
+    "bemestar",
+    "leah hope"
   ],
   "daily_runs": [
     {
@@ -235,7 +244,15 @@
       "total_found": 4,
       "total_qualified": 0,
       "execution_time": 25.765594244003296
+    },
+    {
+      "date": "2026-01-18",
+      "timestamp": "2026-01-18T13:37:42.845722",
+      "influencers_count": 2,
+      "total_found": 1,
+      "total_qualified": 0,
+      "execution_time": 13.256608724594116
     }
   ],
-  "last_updated": "2026-01-17T14:28:02.302182"
+  "last_updated": "2026-01-18T13:37:42.845845"
 }
