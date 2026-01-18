@@ -52,6 +52,7 @@ jobs:
       - name: Run prospection
         id: prospection
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
         run: |
@@ -59,7 +60,7 @@ jobs:
           FORMAT=${{ github.event.inputs.output_format || 'all' }}
           echo "Running prospection with count=$COUNT and format=$FORMAT"
           python run_prospection.py --count $COUNT --output-format $FORMAT
-          echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+          echo "date=$(date +%Y-%m-%d )" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
