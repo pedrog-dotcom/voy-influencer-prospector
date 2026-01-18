@@ -3,12 +3,15 @@
 Script principal para execução da prospecção diária de influenciadores.
 Voy Saúde - Prospecção de Influenciadores
 
+Versão 3.0 - Com análise de IA para identificar pessoas reais.
+
 Uso:
     python run_prospection.py [--count N] [--output-format FORMAT]
 
 Opções:
     --count N           Número de influenciadores a prospectar (padrão: 20)
-    --output-format     Formato de saída: json, csv, markdown (padrão: json)
+    --output-format     Formato de saída: json, csv, markdown (padrão: all)
+    --verbose           Modo verboso com mais detalhes
 """
 
 import sys
@@ -22,7 +25,7 @@ from datetime import datetime
 # Adicionar diretório src ao path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from prospector_v2 import InfluencerProspectorV2
+from prospector_v3 import InfluencerProspectorV3
 from models import ProspectionResult
 from config import DATA_DIR, DAILY_PROSPECT_COUNT
 
@@ -43,6 +46,10 @@ def export_to_csv(result: ProspectionResult, output_path: Path):
             'Média de Likes',
             'Verificado',
             'Bio',
+            'Tipo de Perfil',
+            'Pessoa Real',
+            'Jornada de Peso',
+            'Potencial de Parceria',
             'Palavra-chave Fonte',
             'Data Prospecção',
             'Notas',
@@ -51,6 +58,12 @@ def export_to_csv(result: ProspectionResult, output_path: Path):
         # Dados
         for influencer in result.influencers:
             profile = influencer.profiles[0] if influencer.profiles else None
+            
+            # Extrair análise das notas
+            notes = influencer.notes or ''
+            is_real = '✓ Pessoa real' in notes
+            has_journey = '✓ Jornada de emagrecimento' in notes
+            
             writer.writerow([
                 influencer.name,
                 influencer.primary_platform.value,
@@ -61,9 +74,13 @@ def export_to_csv(result: ProspectionResult, output_path: Path):
                 profile.avg_likes if profile else 0,
                 'Sim' if (profile and profile.verified) else 'Não',
                 influencer.bio[:100] if influencer.bio else '',
+                'Pessoa Real' if is_real else 'A Verificar',
+                'Sim' if is_real else 'Não',
+                'Sim' if has_journey else 'Não',
+                '',  # Potencial de parceria (extrair se disponível)
                 influencer.source_keyword,
                 influencer.prospected_at,
-                influencer.notes,
+                notes[:200],
             ])
 
 
@@ -80,23 +97,32 @@ def export_to_markdown(result: ProspectionResult, output_path: Path):
         f"- **Selecionados:** {len(result.influencers)}",
         f"- **Tempo de execução:** {result.execution_time_seconds:.2f}s",
         "",
+        "## Critérios de Seleção",
+        "",
+        "- **Foco:** Pessoas reais com sobrepeso/obesidade ou em jornada de emagrecimento",
+        "- **Análise:** Perfis analisados por IA para identificar autenticidade",
+        "- **Nichos:** Lifestyle, moda plus size, autocuidado, culinária saudável",
+        "",
         "## Influenciadores Prospectados",
         "",
-        "| # | Nome | Plataforma | Username | Seguidores | Engajamento | URL |",
-        "|---|------|------------|----------|------------|-------------|-----|",
+        "| # | Nome | Plataforma | Seguidores | Engajamento | Pessoa Real | URL |",
+        "|---|------|------------|------------|-------------|-------------|-----|",
     ]
     
     for i, influencer in enumerate(result.influencers, 1):
         profile = influencer.profiles[0] if influencer.profiles else None
+        is_real = '✓ Pessoa real' in (influencer.notes or '')
+        real_badge = "✓" if is_real else "?"
+        
         if profile:
             lines.append(
                 f"| {i} | {influencer.name[:25]} | {influencer.primary_platform.value} | "
-                f"@{profile.username[:15]} | {profile.followers:,} | "
-                f"{profile.engagement_rate}% | [Link]({profile.url}) |"
+                f"{profile.followers:,} | {profile.engagement_rate}% | {real_badge} | "
+                f"[Link]({profile.url}) |"
             )
     
     lines.append("")
-    lines.append("## Detalhes")
+    lines.append("## Detalhes dos Perfis")
     lines.append("")
     
     for i, influencer in enumerate(result.influencers, 1):
@@ -121,7 +147,7 @@ def export_to_markdown(result: ProspectionResult, output_path: Path):
             lines.append(f"- **Bio:** {influencer.bio[:200]}")
         
         if influencer.notes:
-            lines.append(f"- **Notas:** {influencer.notes}")
+            lines.append(f"- **Análise:** {influencer.notes}")
         
         lines.append("")
     
@@ -141,7 +167,7 @@ def export_to_markdown(result: ProspectionResult, output_path: Path):
 def main():
     """Função principal."""
     parser = argparse.ArgumentParser(
-        description='Prospecção diária de influenciadores para Voy Saúde'
+        description='Prospecção diária de influenciadores para Voy Saúde (V3 - Com IA)'
     )
     parser.add_argument(
         '--count', 
@@ -152,8 +178,8 @@ def main():
     parser.add_argument(
         '--output-format',
         choices=['json', 'csv', 'markdown', 'all'],
-        default='json',
-        help='Formato de saída (padrão: json)'
+        default='all',
+        help='Formato de saída (padrão: all)'
     )
     parser.add_argument(
         '--verbose',
@@ -171,16 +197,17 @@ def main():
     )
     
     print("=" * 60)
-    print("VOY SAÚDE - PROSPECÇÃO DE INFLUENCIADORES")
+    print("VOY SAÚDE - PROSPECÇÃO DE INFLUENCIADORES (V3)")
     print("=" * 60)
     print(f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Meta: {args.count} influenciadores")
     print(f"Formato de saída: {args.output_format}")
+    print(f"Foco: Pessoas reais com sobrepeso/obesidade")
     print("=" * 60)
     print()
     
     # Executar prospecção
-    prospector = InfluencerProspectorV2()
+    prospector = InfluencerProspectorV3()
     result = prospector.run_prospection(target_count=args.count)
     
     # Garantir diretório de saída
@@ -218,6 +245,14 @@ def main():
     if result.errors:
         print(f"\nErros encontrados: {len(result.errors)}")
     
+    # Contar pessoas reais
+    real_count = sum(1 for inf in result.influencers if '✓ Pessoa real' in (inf.notes or ''))
+    journey_count = sum(1 for inf in result.influencers if '✓ Jornada de emagrecimento' in (inf.notes or ''))
+    
+    print(f"\nAnálise de IA:")
+    print(f"  - Pessoas reais identificadas: {real_count}")
+    print(f"  - Com jornada de emagrecimento: {journey_count}")
+    
     print()
     print("-" * 60)
     print("INFLUENCIADORES PROSPECTADOS:")
@@ -229,12 +264,26 @@ def main():
         followers = f"{profile.followers:,}" if profile else "N/A"
         engagement = f"{profile.engagement_rate}%" if profile else "N/A"
         
-        print(f"{i:2}. [{platform:7}] {influencer.name[:30]:30} | "
-              f"Seg: {followers:>12} | Eng: {engagement:>7}")
+        # Badges
+        badges = []
+        if '✓ Pessoa real' in (influencer.notes or ''):
+            badges.append("👤")
+        if '✓ Jornada de emagrecimento' in (influencer.notes or ''):
+            badges.append("🎯")
+        
+        badge_str = " ".join(badges) if badges else ""
+        
+        print(f"\n{i:2}. [{platform:9}] {influencer.name[:30]} {badge_str}")
+        print(f"    Seguidores: {followers} | Engajamento: {engagement}")
         if profile:
             print(f"    URL: {profile.url}")
+        if influencer.bio:
+            bio_preview = influencer.bio[:60] + "..." if len(influencer.bio) > 60 else influencer.bio
+            print(f"    Bio: {bio_preview}")
     
     print()
+    print("=" * 60)
+    print("Legenda: 👤 = Pessoa real | 🎯 = Jornada de emagrecimento")
     print("=" * 60)
     print("Prospecção concluída com sucesso!")
     print("=" * 60)

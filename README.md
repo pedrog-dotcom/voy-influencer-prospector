@@ -1,26 +1,55 @@
 # 🎯 Voy Saúde - Prospecção de Influenciadores
 
-Sistema automatizado de prospecção diária de influenciadores para a marca [Voy Saúde](https://www.voysaude.com.br/), focado em perfis relacionados a emagrecimento, sobrepeso e obesidade.
+Sistema automatizado de prospecção diária de influenciadores para a marca [Voy Saúde](https://www.voysaude.com.br/), focado em **pessoas reais** com sobrepeso/obesidade ou em jornada de emagrecimento.
 
 ## 📋 Descrição
 
-Este projeto automatiza a busca e qualificação de influenciadores nas plataformas **Instagram** (prioritário), **TikTok** e **YouTube**, com foco em:
+Este projeto automatiza a busca e qualificação de influenciadores nas plataformas **Instagram** (prioritário), **TikTok** e **YouTube**, utilizando **análise de IA (GPT)** para identificar pessoas reais e filtrar páginas comerciais.
 
-- **Nicho**: Emagrecimento, sobrepeso, obesidade, transformação corporal
-- **Critério de qualificação**: Taxa de engajamento mínima de 2,5%
-- **Volume diário**: 20 influenciadores únicos por dia
-- **Controle de duplicatas**: Sistema de histórico para evitar repetições
+### Foco Principal
+
+- **Pessoas reais** compartilhando suas jornadas de vida
+- **Sobrepeso/obesidade** ou processo de emagrecimento
+- **Plus size**, lifestyle, autocuidado, culinária saudável
+- **Nano/micro influenciadores** (1k-50k seguidores) - mais autênticos
+
+### O que evitamos
+
+- ❌ Páginas comerciais e lojas
+- ❌ Nutricionistas e personal trainers vendendo serviços
+- ❌ Coaches e mentores com cursos
+- ❌ Perfis de marcas e empresas
 
 ## 🚀 Funcionalidades
 
+- ✅ **Análise com IA (GPT)** para identificar pessoas reais
 - ✅ Busca automatizada no **Instagram** (via Graph API)
 - ✅ Busca automatizada no **TikTok** e **YouTube**
 - ✅ Cálculo de taxa de engajamento
-- ✅ Filtro por palavras-chave relevantes
+- ✅ Filtro por palavras-chave expandidas (lifestyle, plus size, autocuidado)
 - ✅ Controle de histórico para evitar duplicatas
 - ✅ Exportação em múltiplos formatos (JSON, CSV, Markdown)
 - ✅ Geração de relatórios detalhados
 - ✅ Execução agendada via GitHub Actions (diariamente às 9h)
+
+## 🤖 Análise com IA
+
+O sistema utiliza GPT para analisar cada perfil e determinar:
+
+| Critério | Descrição |
+|----------|-----------|
+| **Tipo de perfil** | Pessoa real, comercial, profissional |
+| **Tipo corporal** | Sobrepeso, obeso, plus size, jornada de emagrecimento |
+| **Autenticidade** | Score de 0-100 |
+| **Potencial de parceria** | Score de 0-100 |
+| **Recomendação** | Se o perfil é adequado para parceria |
+
+### Exemplo de Resultado
+
+```
+✓ Pessoa real | ✓ Jornada de emagrecimento | Tipo: plus_size
+Análise: Perfil parece ser de pessoa real com indicadores de jornada de emagrecimento (tamanho: micro)
+```
 
 ## 📊 Plataformas Suportadas
 
@@ -36,11 +65,12 @@ Este projeto automatiza a busca e qualificação de influenciadores nas platafor
 voy-influencer-prospector/
 ├── src/
 │   ├── __init__.py
-│   ├── config.py               # Configurações do projeto
+│   ├── config.py               # Configurações e palavras-chave expandidas
 │   ├── models.py               # Modelos de dados
 │   ├── history_manager.py      # Gerenciamento de histórico
+│   ├── profile_analyzer.py     # 🆕 Análise de perfis com IA (GPT)
 │   ├── instagram_prospector.py # Prospecção do Instagram
-│   ├── prospector_v2.py        # Lógica principal de prospecção
+│   ├── prospector_v3.py        # 🆕 Lógica principal V3 com IA
 │   └── report_generator.py     # Geração de relatórios
 ├── data/
 │   ├── prospected_influencers.json  # Histórico de influenciadores
@@ -61,6 +91,7 @@ voy-influencer-prospector/
 ### Pré-requisitos
 
 - Python 3.11+
+- API Key do OpenAI (para análise com IA)
 - Token de acesso da Graph API do Instagram (opcional, mas recomendado)
 
 ### Instalação Local
@@ -74,11 +105,15 @@ cd voy-influencer-prospector
 pip install -r requirements.txt
 ```
 
-### Configuração do Instagram
+### Configuração
 
-Para habilitar a prospecção do Instagram, configure as variáveis de ambiente:
+Configure as variáveis de ambiente:
 
 ```bash
+# Obrigatório para análise com IA
+export OPENAI_API_KEY="sua_api_key_openai"
+
+# Opcional - para prospecção do Instagram
 export INSTAGRAM_ACCESS_TOKEN="seu_token_aqui"
 export INSTAGRAM_USER_ID="id_da_sua_pagina"
 ```
@@ -106,7 +141,7 @@ python run_prospection.py --verbose
 | Opção | Descrição | Padrão |
 |-------|-----------|--------|
 | `--count N` | Número de influenciadores a prospectar | 20 |
-| `--output-format` | Formato de saída (json, csv, markdown, all) | json |
+| `--output-format` | Formato de saída (json, csv, markdown, all) | all |
 | `--verbose` | Modo verboso com mais detalhes | False |
 
 ## 📊 Formatos de Saída
@@ -114,29 +149,31 @@ python run_prospection.py --verbose
 ### JSON
 ```json
 {
-  "date": "2026-01-17",
+  "date": "2026-01-18",
   "influencers": [
     {
-      "name": "personaltrainerbr",
-      "primary_platform": "instagram",
+      "name": "Aline_Brumatti",
+      "primary_platform": "tiktok",
       "profiles": [
         {
-          "platform": "instagram",
-          "username": "personaltrainerbr",
-          "url": "https://www.instagram.com/personaltrainerbr/",
-          "followers": 1858,
-          "engagement_rate": 2.99
+          "platform": "tiktok",
+          "username": "alinebrumatti",
+          "url": "https://www.tiktok.com/@alinebrumatti",
+          "followers": 12300,
+          "engagement_rate": 9.99
         }
-      ]
+      ],
+      "bio": "✨Minha vida real✨ 🏋🏻‍♀️Processo de emagrecimento",
+      "notes": "✓ Pessoa real | ✓ Jornada de emagrecimento"
     }
   ],
-  "total_found": 42,
-  "total_qualified": 30
+  "total_found": 61,
+  "total_qualified": 33
 }
 ```
 
 ### CSV
-Arquivo com colunas: Nome, Plataforma, Username, URL, Seguidores, Engajamento, etc.
+Arquivo com colunas: Nome, Plataforma, Username, URL, Seguidores, Engajamento, Pessoa Real, Jornada de Peso, etc.
 
 ### Markdown
 Relatório formatado com tabelas e detalhes de cada influenciador.
@@ -149,7 +186,7 @@ O projeto inclui um workflow do GitHub Actions que executa automaticamente a pro
 
 Siga as instruções detalhadas em [SETUP_GITHUB.md](SETUP_GITHUB.md) para:
 
-1. Configurar os secrets do Instagram no GitHub
+1. Configurar os secrets no GitHub
 2. Adicionar o arquivo de workflow
 3. Executar manualmente ou aguardar a execução automática
 
@@ -157,40 +194,60 @@ Siga as instruções detalhadas em [SETUP_GITHUB.md](SETUP_GITHUB.md) para:
 
 | Secret | Descrição |
 |--------|-----------|
+| `OPENAI_API_KEY` | API Key do OpenAI para análise com IA |
 | `INSTAGRAM_ACCESS_TOKEN` | Token de acesso da Graph API do Instagram |
 | `INSTAGRAM_USER_ID` | ID da página do Instagram |
 
 ## 📈 Palavras-chave de Busca
 
-### Português
-- emagrecimento, perda de peso, dieta
-- obesidade, sobrepeso, reeducação alimentar
-- antes e depois, transformação corporal
-- ozempic, semaglutida, mounjaro, wegovy
+### Jornada Pessoal
+- minha jornada, minha transformação, meu antes e depois
+- diário de emagrecimento, perdendo peso, mudança de vida
 
-### Inglês
-- weight loss journey, obesity transformation
-- overweight fitness, before and after weight loss
-- body transformation, weight loss motivation
+### Plus Size / Body Positive
+- moda plus size, curvy fashion, gordasestilosas
+- body positive, todas as curvas, gordinha fashion
+
+### Lifestyle
+- vida saudável, rotina saudável, hábitos saudáveis
+- qualidade de vida, bem estar, saúde mental
+
+### Autocuidado
+- autocuidado, self care, amor próprio
+- autoestima, empoderamento, confiança
+
+### Culinária
+- receitas saudáveis, comida de verdade
+- alimentação saudável, low carb, reeducação alimentar
+
+### Medicamentos (experiências pessoais)
+- ozempic, semaglutida, mounjaro, wegovy
 
 ## 🎯 Critérios de Qualificação
 
 | Critério | Requisito |
 |----------|-----------|
 | Taxa de Engajamento | ≥ 2,5% |
+| Tipo de Perfil | Pessoa real (validado por IA) |
+| Tamanho Preferido | Nano/Micro (1k-50k seguidores) |
 | Plataformas | Instagram (prioritário), TikTok, YouTube |
-| Nicho | Emagrecimento, saúde, bem-estar |
+| Nicho | Emagrecimento, plus size, lifestyle, autocuidado |
 | Histórico | Não prospectado anteriormente |
 
 ## 🔧 Manutenção
 
 ### Expandir Lista de Influenciadores do Instagram
 
-Edite `src/instagram_prospector.py` e adicione usernames à lista `SEED_INFLUENCERS`.
+Edite `src/prospector_v3.py` e adicione usernames à lista `SEED_INFLUENCERS_REAL`.
 
 ### Adicionar Novas Palavras-chave
 
-Edite `src/config.py` e adicione às listas `SEARCH_KEYWORDS_PT` ou `SEARCH_KEYWORDS_EN`.
+Edite `src/config.py` e adicione às listas correspondentes:
+- `SEARCH_KEYWORDS_JOURNEY` - Jornada pessoal
+- `SEARCH_KEYWORDS_LIFESTYLE` - Lifestyle
+- `SEARCH_KEYWORDS_FASHION` - Moda plus size
+- `SEARCH_KEYWORDS_SELFCARE` - Autocuidado
+- `SEARCH_KEYWORDS_FOOD` - Culinária
 
 ### Renovar Token do Instagram
 
@@ -205,6 +262,7 @@ Tokens de longa duração expiram após ~60 dias. Para renovar:
 Os logs são exibidos durante a execução com informações sobre:
 - Início e fim da execução
 - Quantidade de perfis encontrados por plataforma
+- Análise de IA (pessoas reais identificadas)
 - Erros e exceções
 - Tempo de execução
 
@@ -218,4 +276,4 @@ Para dúvidas ou suporte, entre em contato com a equipe de marketing da Voy Saú
 
 ---
 
-**Desenvolvido para Voy Saúde** | Prospecção Automatizada de Influenciadores
+**Desenvolvido para Voy Saúde** | Prospecção Automatizada de Influenciadores com IA

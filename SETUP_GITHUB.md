@@ -2,9 +2,9 @@
 
 Este guia explica como configurar o GitHub Actions para executar a prospecção de influenciadores automaticamente todos os dias.
 
-## Passo 1: Configurar os Secrets do Instagram
+## Passo 1: Configurar os Secrets
 
-Para que a integração com o Instagram funcione, você precisa adicionar suas credenciais como secrets no GitHub.
+Para que a prospecção funcione corretamente, você precisa adicionar suas credenciais como secrets no GitHub.
 
 ### 1.1 Acesse as configurações do repositório
 
@@ -16,26 +16,29 @@ Para que a integração com o Instagram funcione, você precisa adicionar suas c
 
 Clique em **New repository secret** e adicione os seguintes secrets:
 
-| Nome do Secret | Valor |
-|----------------|-------|
-| `INSTAGRAM_ACCESS_TOKEN` | Seu token de acesso da Graph API do Instagram |
-| `INSTAGRAM_USER_ID` | O ID da sua página do Instagram (ex: `17841466934369795`) |
+| Nome do Secret | Descrição | Obrigatório |
+|----------------|-----------|-------------|
+| `OPENAI_API_KEY` | API Key do OpenAI para análise de perfis com IA | ✅ Sim |
+| `INSTAGRAM_ACCESS_TOKEN` | Token de acesso da Graph API do Instagram | Recomendado |
+| `INSTAGRAM_USER_ID` | ID da página do Instagram (ex: `17841466934369795`) | Recomendado |
 
 **Importante:** Os valores dos secrets são criptografados e nunca serão exibidos nos logs.
 
-## Passo 2: Substituir o Workflow Atual
+### 1.3 Obter API Key do OpenAI
 
-O arquivo de workflow atual tem um erro de sintaxe. Siga os passos abaixo para substituí-lo:
+Se você ainda não tem uma API Key do OpenAI:
 
-### 2.1 Deletar o workflow atual
+1. Acesse https://platform.openai.com/
+2. Faça login ou crie uma conta
+3. Vá em **API Keys** no menu
+4. Clique em **Create new secret key**
+5. Copie a chave gerada e adicione como secret `OPENAI_API_KEY`
 
-1. No repositório, vá para `.github/workflows/daily_prospection.yml`
-2. Clique no ícone de lixeira (Delete file)
-3. Confirme a exclusão com um commit
+## Passo 2: Criar o Workflow
 
-### 2.2 Criar o novo workflow
+### 2.1 Criar o arquivo de workflow
 
-1. Clique em **Add file** > **Create new file**
+1. No repositório, clique em **Add file** > **Create new file**
 2. No campo de nome, digite: `.github/workflows/daily_prospection.yml`
 3. Cole o conteúdo abaixo:
 
@@ -94,6 +97,7 @@ jobs:
       - name: Run prospection
         id: prospection
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
         run: |
@@ -185,6 +189,19 @@ O workflow está configurado para executar automaticamente:
 - **Frequência:** Todos os dias
 - **Cron:** `0 12 * * *` (12h UTC = 9h BRT)
 
+## O que a Análise com IA faz
+
+A cada execução, o sistema:
+
+1. **Busca perfis** no Instagram, TikTok e YouTube
+2. **Analisa cada perfil com GPT** para determinar:
+   - Se é uma pessoa real ou página comercial
+   - Se tem sobrepeso/obesidade ou está em jornada de emagrecimento
+   - Score de autenticidade (0-100)
+   - Potencial de parceria (0-100)
+3. **Filtra e prioriza** pessoas reais com alto potencial
+4. **Gera relatórios** em múltiplos formatos
+
 ## Formatos de Saída
 
 A cada execução, os seguintes arquivos são gerados:
@@ -201,7 +218,15 @@ A cada execução, os seguintes arquivos são gerados:
 
 1. Verifique se os secrets estão configurados corretamente
 2. Confira os logs na aba Actions para identificar o erro
-3. Certifique-se de que o token do Instagram não expirou
+3. Certifique-se de que a API Key do OpenAI está válida
+4. Verifique se o token do Instagram não expirou
+
+### API Key do OpenAI inválida
+
+1. Acesse https://platform.openai.com/api-keys
+2. Verifique se a chave está ativa
+3. Se necessário, gere uma nova chave
+4. Atualize o secret `OPENAI_API_KEY` no GitHub
 
 ### Token do Instagram expirou
 
@@ -214,6 +239,25 @@ Tokens de longa duração do Instagram duram aproximadamente 60 dias. Para renov
 ### Nenhum influenciador do Instagram encontrado
 
 A API do Instagram só retorna dados de perfis **Business** ou **Creator**. Perfis pessoais não são acessíveis via API.
+
+### Poucos perfis recomendados
+
+Se a IA está filtrando muitos perfis:
+- Verifique os logs para entender os motivos
+- Ajuste o `min_partnership_potential` em `prospector_v3.py` se necessário
+
+## Custos
+
+### OpenAI API
+
+A análise com IA usa o modelo `gpt-4.1-mini`, que tem custo por token:
+- Aproximadamente $0.01-0.05 por execução diária (20 perfis)
+- Monitore seu uso em https://platform.openai.com/usage
+
+### GitHub Actions
+
+- Repositórios públicos: gratuito
+- Repositórios privados: 2.000 minutos/mês gratuitos
 
 ## Suporte
 
