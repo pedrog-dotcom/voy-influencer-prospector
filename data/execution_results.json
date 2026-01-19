@@ -50,5 +50,18 @@
     "total_approved_all_time": 0,
     "pending_profiles": 0,
     "status": "sem_pendentes"
+  },
+  {
+    "execution_date": "2026-01-19",
+    "execution_time": "18:35:11",
+    "duration_seconds": 398.78,
+    "new_profiles_collected": 60,
+    "profiles_analyzed": 60,
+    "new_approved": 7,
+    "total_approved_today": 7,
+    "total_processed_all_time": 70,
+    "total_approved_all_time": 7,
+    "pending_profiles": 0,
+    "status": "sucesso"
   }
 ]
