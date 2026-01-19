@@ -314,8 +314,26 @@ def main():
         default=DAILY_OUTPUT_COUNT,
         help=f"Meta de aprovados (padrão: {DAILY_OUTPUT_COUNT})"
     )
+    # Argumentos de compatibilidade com workflow antigo
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=None,
+        help="Alias para --target (compatibilidade)"
+    )
+    parser.add_argument(
+        "--output-format",
+        type=str,
+        default="all",
+        choices=["json", "csv", "markdown", "all"],
+        help="Formato de saída (padrão: all)"
+    )
     
     args = parser.parse_args()
+    
+    # Usar --count como alias para --target se fornecido
+    if args.count is not None:
+        args.target = args.count
     
     pipeline = ProspectionPipeline()
     
