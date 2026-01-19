@@ -115,7 +115,7 @@ SEED_INFLUENCERS_REAL = [
     "isapbf",
     "isabellaassiis",
     "baridacints",
-    "carinacampeao_"
+    "carinacampeao_",
 ]
 
 
