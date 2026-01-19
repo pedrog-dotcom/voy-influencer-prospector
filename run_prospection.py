@@ -1,295 +1,335 @@
 #!/usr/bin/env python3
 """
-Script principal para execução da prospecção diária de influenciadores.
-Voy Saúde - Prospecção de Influenciadores
+Voy Saúde - Sistema de Prospecção de Influenciadores V4
 
-Versão 3.0 - Com análise de IA para identificar pessoas reais.
+Fluxo otimizado:
+1. Coleta perfis via hashtags (TikTok, Instagram, YouTube)
+2. Filtra por 10k+ seguidores e 2.5%+ engajamento
+3. Verifica histórico para não reprocessar perfis (economia de tokens)
+4. Triagem GPT: idade 25+, sobrepeso/obeso, classe A/B, brasileiro
+5. Salva 20 aprovados por dia em CSV
 
 Uso:
-    python run_prospection.py [--count N] [--output-format FORMAT]
-
-Opções:
-    --count N           Número de influenciadores a prospectar (padrão: 20)
-    --output-format     Formato de saída: json, csv, markdown (padrão: all)
-    --verbose           Modo verboso com mais detalhes
+    python run_prospection.py [--collect] [--screen] [--all]
+    
+    --collect: Apenas coleta novos perfis
+    --screen: Apenas faz triagem dos pendentes
+    --all: Executa fluxo completo (padrão)
 """
 
+import os
 import sys
-import argparse
 import json
-import csv
 import logging
-from pathlib import Path
+import argparse
 from datetime import datetime
+from pathlib import Path
 
-# Adicionar diretório src ao path
+# Adicionar src ao path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from prospector_v3 import InfluencerProspectorV3
-from models import ProspectionResult
-from config import DATA_DIR, DAILY_PROSPECT_COUNT
+from config import (
+    DATA_DIR,
+    LOGS_DIR,
+    DAILY_OUTPUT_COUNT,
+    MIN_FOLLOWERS,
+    MIN_ENGAGEMENT_RATE,
+    get_active_hashtags,
+)
+from history_manager import HistoryManager
+from hashtag_collector import collect_profiles_from_hashtags
+from gpt_screener import screen_profiles, GPTScreener
 
+# Configurar logging
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+log_file = LOGS_DIR / f"prospection_{datetime.now().strftime('%Y-%m-%d')}.log"
 
-def export_to_csv(result: ProspectionResult, output_path: Path):
-    """Exporta resultado para CSV."""
-    with open(output_path, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        
-        # Cabeçalho
-        writer.writerow([
-            'Nome',
-            'Plataforma Principal',
-            'Username',
-            'URL',
-            'Seguidores',
-            'Taxa de Engajamento (%)',
-            'Média de Likes',
-            'Verificado',
-            'Bio',
-            'Tipo de Perfil',
-            'Pessoa Real',
-            'Jornada de Peso',
-            'Potencial de Parceria',
-            'Palavra-chave Fonte',
-            'Data Prospecção',
-            'Notas',
-        ])
-        
-        # Dados
-        for influencer in result.influencers:
-            profile = influencer.profiles[0] if influencer.profiles else None
-            
-            # Extrair análise das notas
-            notes = influencer.notes or ''
-            is_real = '✓ Pessoa real' in notes
-            has_journey = '✓ Jornada de emagrecimento' in notes
-            
-            writer.writerow([
-                influencer.name,
-                influencer.primary_platform.value,
-                profile.username if profile else '',
-                profile.url if profile else '',
-                profile.followers if profile else 0,
-                profile.engagement_rate if profile else 0,
-                profile.avg_likes if profile else 0,
-                'Sim' if (profile and profile.verified) else 'Não',
-                influencer.bio[:100] if influencer.bio else '',
-                'Pessoa Real' if is_real else 'A Verificar',
-                'Sim' if is_real else 'Não',
-                'Sim' if has_journey else 'Não',
-                '',  # Potencial de parceria (extrair se disponível)
-                influencer.source_keyword,
-                influencer.prospected_at,
-                notes[:200],
-            ])
-
-
-def export_to_markdown(result: ProspectionResult, output_path: Path):
-    """Exporta resultado para Markdown."""
-    lines = [
-        f"# Prospecção de Influenciadores - {result.date}",
-        "",
-        "## Resumo",
-        "",
-        f"- **Data:** {result.date}",
-        f"- **Total encontrados:** {result.total_found}",
-        f"- **Total qualificados (engajamento >= 2.5%):** {result.total_qualified}",
-        f"- **Selecionados:** {len(result.influencers)}",
-        f"- **Tempo de execução:** {result.execution_time_seconds:.2f}s",
-        "",
-        "## Critérios de Seleção",
-        "",
-        "- **Foco:** Pessoas reais com sobrepeso/obesidade ou em jornada de emagrecimento",
-        "- **Análise:** Perfis analisados por IA para identificar autenticidade",
-        "- **Nichos:** Lifestyle, moda plus size, autocuidado, culinária saudável",
-        "",
-        "## Influenciadores Prospectados",
-        "",
-        "| # | Nome | Plataforma | Seguidores | Engajamento | Pessoa Real | URL |",
-        "|---|------|------------|------------|-------------|-------------|-----|",
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(log_file, encoding='utf-8'),
+        logging.StreamHandler()
     ]
+)
+logger = logging.getLogger(__name__)
+
+
+class ProspectionPipeline:
+    """Pipeline completo de prospecção de influenciadores."""
     
-    for i, influencer in enumerate(result.influencers, 1):
-        profile = influencer.profiles[0] if influencer.profiles else None
-        is_real = '✓ Pessoa real' in (influencer.notes or '')
-        real_badge = "✓" if is_real else "?"
+    def __init__(self):
+        self.history = HistoryManager()
+        self.screener = GPTScreener()
         
-        if profile:
-            lines.append(
-                f"| {i} | {influencer.name[:25]} | {influencer.primary_platform.value} | "
-                f"{profile.followers:,} | {profile.engagement_rate}% | {real_badge} | "
-                f"[Link]({profile.url}) |"
+    def run_collection(self, max_per_hashtag: int = 30) -> int:
+        """
+        Etapa 1: Coleta perfis de hashtags.
+        
+        Returns:
+            Número de novos perfis coletados
+        """
+        logger.info("=" * 60)
+        logger.info("ETAPA 1: COLETA DE PERFIS VIA HASHTAGS")
+        logger.info("=" * 60)
+        
+        active_hashtags = get_active_hashtags()
+        logger.info(f"Hashtags ativas: {len(active_hashtags)}")
+        logger.info(f"Critérios sugeridos: {MIN_FOLLOWERS:,}+ seguidores, {MIN_ENGAGEMENT_RATE}%+ engajamento")
+        logger.info("NOTA: Todos os perfis serão salvos para triagem GPT (filtro flexível)")
+        
+        # Coletar perfis (retorna todos, não apenas qualificados)
+        collected = collect_profiles_from_hashtags(max_per_hashtag)
+        
+        if not collected:
+            logger.warning("Nenhum perfil coletado das hashtags")
+            return 0
+        
+        # Converter para dict - TODOS os perfis, não apenas qualificados
+        profiles_data = [p.to_dict() for p in collected]
+        logger.info(f"Total de perfis coletados: {len(profiles_data)}")
+        
+        # Filtrar não processados
+        new_profiles = self.history.filter_unprocessed(profiles_data)
+        
+        if new_profiles:
+            # Salvar como pendentes
+            self.history.save_pending_profiles(new_profiles)
+            logger.info(f"✓ {len(new_profiles)} novos perfis salvos para triagem")
+        else:
+            logger.info("Nenhum perfil novo (todos já processados)")
+        
+        return len(new_profiles)
+    
+    def run_screening(self, target_approved: int = DAILY_OUTPUT_COUNT) -> dict:
+        """
+        Etapa 2: Triagem GPT dos perfis pendentes.
+        
+        Args:
+            target_approved: Meta de aprovados
+            
+        Returns:
+            Estatísticas da triagem
+        """
+        logger.info("=" * 60)
+        logger.info("ETAPA 2: TRIAGEM GPT DOS PERFIS")
+        logger.info("=" * 60)
+        
+        # Verificar quantos já foram aprovados hoje
+        today_approved = self.history.get_today_approved_count()
+        remaining_target = max(0, target_approved - today_approved)
+        
+        if remaining_target == 0:
+            logger.info(f"Meta diária já atingida ({today_approved} aprovados hoje)")
+            return {
+                "status": "meta_atingida",
+                "today_approved": today_approved,
+                "new_approved": 0,
+                "analyzed": 0
+            }
+        
+        logger.info(f"Meta: {remaining_target} aprovações (já temos {today_approved} hoje)")
+        
+        # Obter perfis pendentes
+        pending = self.history.get_pending_profiles(limit=100)
+        
+        if not pending:
+            logger.warning("Nenhum perfil pendente para triagem")
+            return {
+                "status": "sem_pendentes",
+                "today_approved": today_approved,
+                "new_approved": 0,
+                "analyzed": 0
+            }
+        
+        logger.info(f"Perfis pendentes para análise: {len(pending)}")
+        
+        # Estimar tokens
+        estimate = self.screener.estimate_tokens(min(len(pending), remaining_target * 3))
+        logger.info(f"Estimativa de tokens: ~{estimate['estimated_total_tokens']:,} (${estimate['estimated_cost_usd']:.4f})")
+        
+        # Realizar triagem
+        approved_results, rejected_results = screen_profiles(pending, remaining_target)
+        
+        # Processar resultados
+        processed_profiles = []
+        new_approved_count = 0
+        
+        for result in approved_results:
+            # Encontrar dados originais do perfil
+            profile_data = next(
+                (p for p in pending if p.get("username") == result.username),
+                {}
             )
+            
+            # Marcar como processado
+            self.history.mark_as_processed(
+                username=result.username,
+                platform=result.platform,
+                name=profile_data.get("name", result.username),
+                approved=True,
+                screening_result=result.to_dict(),
+                profile_data=profile_data
+            )
+            
+            # Adicionar ao CSV de aprovados
+            self.history.append_to_approved_csv({
+                **profile_data,
+                "screening": result.to_dict()
+            })
+            
+            processed_profiles.append((result.username, result.platform))
+            new_approved_count += 1
+        
+        for result in rejected_results:
+            profile_data = next(
+                (p for p in pending if p.get("username") == result.username),
+                {}
+            )
+            
+            self.history.mark_as_processed(
+                username=result.username,
+                platform=result.platform,
+                name=profile_data.get("name", result.username),
+                approved=False,
+                screening_result=result.to_dict(),
+                profile_data=profile_data
+            )
+            
+            processed_profiles.append((result.username, result.platform))
+        
+        # Remover dos pendentes
+        self.history.remove_from_pending(processed_profiles)
+        
+        logger.info(f"✓ Triagem concluída: {new_approved_count} aprovados, {len(rejected_results)} rejeitados")
+        
+        return {
+            "status": "sucesso",
+            "today_approved": today_approved + new_approved_count,
+            "new_approved": new_approved_count,
+            "analyzed": len(approved_results) + len(rejected_results),
+            "rejected": len(rejected_results)
+        }
     
-    lines.append("")
-    lines.append("## Detalhes dos Perfis")
-    lines.append("")
+    def run_full_pipeline(self) -> dict:
+        """
+        Executa pipeline completo: coleta + triagem.
+        
+        Returns:
+            Estatísticas completas da execução
+        """
+        start_time = datetime.now()
+        
+        logger.info("=" * 60)
+        logger.info("VOY SAÚDE - PROSPECÇÃO DE INFLUENCIADORES V4")
+        logger.info(f"Início: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info("=" * 60)
+        
+        # Estatísticas iniciais
+        stats = self.history.get_statistics()
+        logger.info(f"Histórico: {stats['total_processed']} processados, {stats['total_approved']} aprovados")
+        
+        # Etapa 1: Coleta
+        new_collected = self.run_collection()
+        
+        # Etapa 2: Triagem
+        screening_result = self.run_screening()
+        
+        # Resumo final
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        
+        final_stats = self.history.get_statistics()
+        
+        result = {
+            "execution_date": start_time.strftime("%Y-%m-%d"),
+            "execution_time": start_time.strftime("%H:%M:%S"),
+            "duration_seconds": round(duration, 2),
+            "new_profiles_collected": new_collected,
+            "profiles_analyzed": screening_result.get("analyzed", 0),
+            "new_approved": screening_result.get("new_approved", 0),
+            "total_approved_today": screening_result.get("today_approved", 0),
+            "total_processed_all_time": final_stats["total_processed"],
+            "total_approved_all_time": final_stats["total_approved"],
+            "pending_profiles": self.history.get_pending_count(),
+            "status": screening_result.get("status", "concluido")
+        }
+        
+        logger.info("=" * 60)
+        logger.info("RESUMO DA EXECUÇÃO")
+        logger.info("=" * 60)
+        logger.info(f"Duração: {duration:.2f} segundos")
+        logger.info(f"Novos perfis coletados: {new_collected}")
+        logger.info(f"Perfis analisados: {result['profiles_analyzed']}")
+        logger.info(f"Novos aprovados: {result['new_approved']}")
+        logger.info(f"Total aprovados hoje: {result['total_approved_today']}")
+        logger.info(f"Perfis pendentes: {result['pending_profiles']}")
+        logger.info("=" * 60)
+        
+        # Salvar resultado da execução
+        self._save_execution_result(result)
+        
+        return result
     
-    for i, influencer in enumerate(result.influencers, 1):
-        profile = influencer.profiles[0] if influencer.profiles else None
+    def _save_execution_result(self, result: dict):
+        """Salva resultado da execução em arquivo JSON."""
+        results_file = DATA_DIR / "execution_results.json"
         
-        lines.extend([
-            f"### {i}. {influencer.name}",
-            "",
-        ])
-        
-        if profile:
-            lines.extend([
-                f"- **Plataforma:** {influencer.primary_platform.value.capitalize()}",
-                f"- **Username:** @{profile.username}",
-                f"- **URL:** {profile.url}",
-                f"- **Seguidores:** {profile.followers:,}",
-                f"- **Taxa de Engajamento:** {profile.engagement_rate}%",
-                f"- **Verificado:** {'Sim' if profile.verified else 'Não'}",
-            ])
-        
-        if influencer.bio:
-            lines.append(f"- **Bio:** {influencer.bio[:200]}")
-        
-        if influencer.notes:
-            lines.append(f"- **Análise:** {influencer.notes}")
-        
-        lines.append("")
-    
-    if result.errors:
-        lines.extend([
-            "## Erros",
-            "",
-        ])
-        for error in result.errors:
-            lines.append(f"- {error}")
-        lines.append("")
-    
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(lines))
+        try:
+            existing = []
+            if results_file.exists():
+                with open(results_file, 'r', encoding='utf-8') as f:
+                    existing = json.load(f)
+            
+            existing.append(result)
+            
+            # Manter apenas últimos 30 dias
+            existing = existing[-30:]
+            
+            with open(results_file, 'w', encoding='utf-8') as f:
+                json.dump(existing, f, ensure_ascii=False, indent=2)
+                
+        except Exception as e:
+            logger.error(f"Erro ao salvar resultado: {e}")
 
 
 def main():
     """Função principal."""
     parser = argparse.ArgumentParser(
-        description='Prospecção diária de influenciadores para Voy Saúde (V3 - Com IA)'
+        description="Voy Saúde - Prospecção de Influenciadores V4"
     )
     parser.add_argument(
-        '--count', 
-        type=int, 
-        default=DAILY_PROSPECT_COUNT,
-        help=f'Número de influenciadores a prospectar (padrão: {DAILY_PROSPECT_COUNT})'
+        "--collect",
+        action="store_true",
+        help="Apenas coleta novos perfis"
     )
     parser.add_argument(
-        '--output-format',
-        choices=['json', 'csv', 'markdown', 'all'],
-        default='all',
-        help='Formato de saída (padrão: all)'
+        "--screen",
+        action="store_true",
+        help="Apenas faz triagem dos pendentes"
     )
     parser.add_argument(
-        '--verbose',
-        action='store_true',
-        help='Modo verboso com mais detalhes'
+        "--target",
+        type=int,
+        default=DAILY_OUTPUT_COUNT,
+        help=f"Meta de aprovados (padrão: {DAILY_OUTPUT_COUNT})"
     )
     
     args = parser.parse_args()
     
-    # Configurar logging
-    log_level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
+    pipeline = ProspectionPipeline()
     
-    print("=" * 60)
-    print("VOY SAÚDE - PROSPECÇÃO DE INFLUENCIADORES (V3)")
-    print("=" * 60)
-    print(f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Meta: {args.count} influenciadores")
-    print(f"Formato de saída: {args.output_format}")
-    print(f"Foco: Pessoas reais com sobrepeso/obesidade")
-    print("=" * 60)
-    print()
-    
-    # Executar prospecção
-    prospector = InfluencerProspectorV3()
-    result = prospector.run_prospection(target_count=args.count)
-    
-    # Garantir diretório de saída
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
-    # Exportar nos formatos solicitados
-    date_str = result.date
-    
-    if args.output_format in ['json', 'all']:
-        json_path = DATA_DIR / f"prospects_{date_str}.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(result.to_dict(), f, ensure_ascii=False, indent=2)
-        print(f"Exportado: {json_path}")
-    
-    if args.output_format in ['csv', 'all']:
-        csv_path = DATA_DIR / f"prospects_{date_str}.csv"
-        export_to_csv(result, csv_path)
-        print(f"Exportado: {csv_path}")
-    
-    if args.output_format in ['markdown', 'all']:
-        md_path = DATA_DIR / f"prospects_{date_str}.md"
-        export_to_markdown(result, md_path)
-        print(f"Exportado: {md_path}")
-    
-    # Exibir resumo
-    print()
-    print("=" * 60)
-    print("RESUMO DA PROSPECÇÃO")
-    print("=" * 60)
-    print(f"Total encontrados: {result.total_found}")
-    print(f"Total qualificados (engajamento >= 2.5%): {result.total_qualified}")
-    print(f"Influenciadores selecionados: {len(result.influencers)}")
-    print(f"Tempo de execução: {result.execution_time_seconds:.2f}s")
-    
-    if result.errors:
-        print(f"\nErros encontrados: {len(result.errors)}")
-    
-    # Contar pessoas reais
-    real_count = sum(1 for inf in result.influencers if '✓ Pessoa real' in (inf.notes or ''))
-    journey_count = sum(1 for inf in result.influencers if '✓ Jornada de emagrecimento' in (inf.notes or ''))
-    
-    print(f"\nAnálise de IA:")
-    print(f"  - Pessoas reais identificadas: {real_count}")
-    print(f"  - Com jornada de emagrecimento: {journey_count}")
-    
-    print()
-    print("-" * 60)
-    print("INFLUENCIADORES PROSPECTADOS:")
-    print("-" * 60)
-    
-    for i, influencer in enumerate(result.influencers, 1):
-        profile = influencer.profiles[0] if influencer.profiles else None
-        platform = influencer.primary_platform.value.upper()
-        followers = f"{profile.followers:,}" if profile else "N/A"
-        engagement = f"{profile.engagement_rate}%" if profile else "N/A"
+    if args.collect:
+        pipeline.run_collection()
+    elif args.screen:
+        pipeline.run_screening(args.target)
+    else:
+        result = pipeline.run_full_pipeline()
         
-        # Badges
-        badges = []
-        if '✓ Pessoa real' in (influencer.notes or ''):
-            badges.append("👤")
-        if '✓ Jornada de emagrecimento' in (influencer.notes or ''):
-            badges.append("🎯")
-        
-        badge_str = " ".join(badges) if badges else ""
-        
-        print(f"\n{i:2}. [{platform:9}] {influencer.name[:30]} {badge_str}")
-        print(f"    Seguidores: {followers} | Engajamento: {engagement}")
-        if profile:
-            print(f"    URL: {profile.url}")
-        if influencer.bio:
-            bio_preview = influencer.bio[:60] + "..." if len(influencer.bio) > 60 else influencer.bio
-            print(f"    Bio: {bio_preview}")
-    
-    print()
-    print("=" * 60)
-    print("Legenda: 👤 = Pessoa real | 🎯 = Jornada de emagrecimento")
-    print("=" * 60)
-    print("Prospecção concluída com sucesso!")
-    print("=" * 60)
-    
-    return 0
+        # Imprimir resultado para GitHub Actions
+        print(f"\n::set-output name=approved::{result['new_approved']}")
+        print(f"::set-output name=total_today::{result['total_approved_today']}")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

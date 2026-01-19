@@ -1,0 +1,28 @@
+[
+  {
+    "execution_date": "2026-01-19",
+    "execution_time": "07:02:08",
+    "duration_seconds": 154.49,
+    "new_profiles_collected": 0,
+    "profiles_analyzed": 0,
+    "new_approved": 0,
+    "total_approved_today": 0,
+    "total_processed_all_time": 0,
+    "total_approved_all_time": 0,
+    "pending_profiles": 0,
+    "status": "sem_pendentes"
+  },
+  {
+    "execution_date": "2026-01-19",
+    "execution_time": "07:09:36",
+    "duration_seconds": 177.41,
+    "new_profiles_collected": 10,
+    "profiles_analyzed": 10,
+    "new_approved": 0,
+    "total_approved_today": 0,
+    "total_processed_all_time": 10,
+    "total_approved_all_time": 0,
+    "pending_profiles": 0,
+    "status": "sucesso"
+  }
+]

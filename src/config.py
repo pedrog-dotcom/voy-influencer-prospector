@@ -1,286 +1,164 @@
 """
-Configurações do projeto de prospecção de influenciadores para Voy Saúde.
+Configurações do sistema de prospecção de influenciadores.
+Voy Saúde - V4: Fluxo otimizado com triagem GPT
 """
 
-import os
 from pathlib import Path
-from typing import List
 
-# Diretórios do projeto
+# Diretórios
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
-# Arquivo de histórico para evitar duplicatas
-HISTORY_FILE = DATA_DIR / "prospected_influencers.json"
-OUTPUT_FILE = DATA_DIR / "daily_prospects.json"
+# Arquivos de dados
+HISTORY_FILE = DATA_DIR / "processed_profiles.json"  # Perfis já processados (não reprocessar)
+APPROVED_FILE = DATA_DIR / "approved_influencers.csv"  # Influenciadores aprovados
+PENDING_FILE = DATA_DIR / "pending_profiles.json"  # Perfis coletados aguardando triagem
 
 # Configurações de prospecção
-DAILY_PROSPECT_COUNT = 20
-MIN_ENGAGEMENT_RATE = 2.5  # Porcentagem mínima de engajamento
+DAILY_OUTPUT_COUNT = 20  # Número de influenciadores aprovados por dia
+MIN_FOLLOWERS = 10000  # Mínimo de seguidores (10k)
+MIN_ENGAGEMENT_RATE = 2.5  # Taxa de engajamento mínima (%)
 
-# Configuração da API OpenAI para análise de perfis
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = "gpt-4.1-mini"  # Modelo para análise de perfis
+# =============================================================================
+# HASHTAGS PARA COLETA DE PERFIS
+# Selecione as hashtags que deseja monitorar (True = ativa, False = inativa)
+# =============================================================================
 
-# ============================================================================
-# PALAVRAS-CHAVE EXPANDIDAS PARA ENCONTRAR PESSOAS REAIS
-# ============================================================================
-
-# Palavras-chave principais - Jornada pessoal de emagrecimento
-SEARCH_KEYWORDS_JOURNEY = [
-    "minha jornada",
-    "minha transformação",
-    "meu antes e depois",
-    "diário de emagrecimento",
-    "minha história de emagrecimento",
-    "perdendo peso",
-    "emagrecendo",
-    "mudança de vida",
-    "novo estilo de vida",
-]
-
-# Palavras-chave - Lifestyle e vida saudável
-SEARCH_KEYWORDS_LIFESTYLE = [
-    "vida saudável",
-    "rotina saudável",
-    "hábitos saudáveis",
-    "mudança de hábitos",
-    "qualidade de vida",
-    "bem estar",
-    "saúde mental",
-    "autoestima",
-    "amor próprio",
-    "aceitação corporal",
-]
-
-# Palavras-chave - Moda Plus Size
-SEARCH_KEYWORDS_FASHION = [
-    "moda plus size",
-    "plus size brasil",
-    "curvy fashion",
-    "moda gg",
-    "look plus size",
-    "estilo plus size",
-    "gordinha fashion",
-    "body positive",
-    "todas as curvas",
-]
-
-# Palavras-chave - Autocuidado
-SEARCH_KEYWORDS_SELFCARE = [
-    "autocuidado",
-    "self care",
-    "cuidando de mim",
-    "rotina de cuidados",
-    "me amando",
-    "autoamor",
-    "empoderamento",
-    "confiança",
-]
-
-# Palavras-chave - Culinária saudável
-SEARCH_KEYWORDS_FOOD = [
-    "receitas saudáveis",
-    "comida de verdade",
-    "alimentação saudável",
-    "cozinhando saudável",
-    "receitas fit",
-    "low carb receitas",
-    "reeducação alimentar",
-    "dieta flexível",
-    "comendo bem",
-]
-
-# Palavras-chave - Fitness iniciante
-SEARCH_KEYWORDS_FITNESS = [
-    "começando a treinar",
-    "iniciante na academia",
-    "voltando a treinar",
-    "treino em casa",
-    "exercício para iniciantes",
-    "saindo do sedentarismo",
-    "primeiro treino",
-]
-
-# Palavras-chave em inglês
-SEARCH_KEYWORDS_EN = [
-    "weight loss journey",
-    "my transformation",
-    "body positive",
-    "plus size fashion",
-    "curvy girl",
-    "healthy lifestyle",
-    "fitness journey",
-    "self love journey",
-    "real body",
-    "no filter transformation",
-]
-
-# Combinar todas as palavras-chave
-SEARCH_KEYWORDS_PT = (
-    SEARCH_KEYWORDS_JOURNEY +
-    SEARCH_KEYWORDS_LIFESTYLE +
-    SEARCH_KEYWORDS_FASHION +
-    SEARCH_KEYWORDS_SELFCARE +
-    SEARCH_KEYWORDS_FOOD +
-    SEARCH_KEYWORDS_FITNESS
-)
-
-# ============================================================================
-# HASHTAGS EXPANDIDAS
-# ============================================================================
-
-# Hashtags - Jornada pessoal
-HASHTAGS_JOURNEY = [
-    "#minhajornada",
-    "#minhatransformacao",
-    "#antesedepois",
-    "#transformacaoreal",
-    "#diariodeemagrecimento",
-    "#perdendopeso",
-    "#emagrecendocomsaude",
-    "#mudancadevida",
-    "#projetoveraofitness",
-]
-
-# Hashtags - Lifestyle
-HASHTAGS_LIFESTYLE = [
-    "#vidasaudavel",
-    "#estilodevida",
-    "#rotinasaudavel",
-    "#habitossaudaveis",
-    "#qualidadedevida",
-    "#bemestar",
-    "#saudemental",
-    "#equilibrio",
-]
-
-# Hashtags - Moda Plus Size
-HASHTAGS_FASHION = [
-    "#plussize",
-    "#plussizebrasil",
-    "#modaplussize",
-    "#curvyfashion",
-    "#modagg",
-    "#gordasestilosas",
-    "#bodypositive",
-    "#todasascurvas",
-    "#curvywoman",
-    "#plussizemodel",
-    "#fatshion",
-]
-
-# Hashtags - Autocuidado
-HASHTAGS_SELFCARE = [
-    "#autocuidado",
-    "#selfcare",
-    "#amorproprio",
-    "#autoestima",
-    "#empoderamento",
-    "#confianca",
-    "#meamando",
-    "#selflove",
-]
-
-# Hashtags - Culinária
-HASHTAGS_FOOD = [
-    "#receitassaudaveis",
-    "#comidadeverdade",
-    "#alimentacaosaudavel",
-    "#receitasfit",
-    "#lowcarb",
-    "#reeducacaoalimentar",
-    "#dietaflexivel",
-    "#comidasaudavel",
-]
-
-# Hashtags - Fitness
-HASHTAGS_FITNESS = [
-    "#fitnessiniciante",
-    "#comecandonaacademia",
-    "#treinoemcasa",
-    "#saindodosedentarismo",
-    "#fitnessmotivation",
-    "#treinoparatodos",
-]
-
-# Hashtags - Medicamentos (pessoas compartilhando experiências)
-HASHTAGS_MEDS = [
-    "#ozempic",
-    "#semaglutida",
-    "#mounjaro",
-    "#wegovy",
-    "#ozempicbrasil",
-    "#tratamentoobesidade",
-]
-
-# Combinar todas as hashtags
-RELEVANT_HASHTAGS = (
-    HASHTAGS_JOURNEY +
-    HASHTAGS_LIFESTYLE +
-    HASHTAGS_FASHION +
-    HASHTAGS_SELFCARE +
-    HASHTAGS_FOOD +
-    HASHTAGS_FITNESS +
-    HASHTAGS_MEDS
-)
-
-# ============================================================================
-# CONFIGURAÇÕES DE FILTRAGEM
-# ============================================================================
-
-# Palavras que indicam página comercial (para filtrar)
-COMMERCIAL_INDICATORS = [
-    "loja", "store", "shop", "oficial", "official",
-    "vendas", "compre", "buy", "promoção", "promo",
-    "atacado", "varejo", "distribuidora", "representante",
-    "suplementos", "produtos", "marca", "brand",
-    "clínica", "clinic", "consultório", "nutricionista",
-    "personal trainer", "coach", "mentoria",
-    "curso", "ebook", "método", "programa",
-    "link na bio", "arrasta pra cima", "cupom",
-]
-
-# Palavras que indicam pessoa real (para priorizar)
-PERSONAL_INDICATORS = [
-    "mãe", "pai", "mamãe", "papai", "mom", "dad",
-    "esposa", "marido", "wife", "husband",
-    "anos", "years old", "nascida", "born",
-    "morando em", "living in", "de", "from",
-    "amo", "love", "apaixonada", "passionate",
-    "minha vida", "my life", "minha história", "my story",
-    "jornada", "journey", "transformação", "transformation",
-    "real", "verdadeira", "authentic",
-    "gordinha", "curvy", "plus size",
-    "lutando", "fighting", "superando", "overcoming",
-]
-
-# Configurações de tamanho de influenciador (seguidores)
-# Focando em nano e micro influenciadores (mais autênticos)
-INFLUENCER_SIZE_RANGES = {
-    "nano": (1_000, 10_000),
-    "micro": (10_000, 50_000),
-    "small": (50_000, 100_000),
-    "medium": (100_000, 500_000),
-    "big": (500_000, 1_000_000),
-    "mega": (1_000_000, float("inf")),
+HASHTAGS_CONFIG = {
+    # Jornada de Emagrecimento
+    "emagrecimento": True,
+    "perdadepeso": True,
+    "antesedepois": True,
+    "minhatransformacao": True,
+    "diariodeemagrecimento": True,
+    "reeducacaoalimentar": True,
+    "mudancadevida": True,
+    
+    # Medicamentos (experiências pessoais)
+    "ozempic": True,
+    "semaglutida": True,
+    "mounjaro": True,
+    "wegovy": True,
+    "saxenda": True,
+    
+    # Plus Size / Body Positive
+    "plussize": True,
+    "plussizebrasil": True,
+    "modaplussize": True,
+    "curvygirl": True,
+    "bodypositive": True,
+    "gordasestilosas": True,
+    "gordinhafashion": True,
+    
+    # Lifestyle Saudável
+    "vidasaudavel": True,
+    "rotinasaudavel": True,
+    "habitossaudaveis": True,
+    "qualidadedevida": True,
+    "bemestar": True,
+    
+    # Autocuidado
+    "autocuidado": True,
+    "selfcare": True,
+    "amorproprio": True,
+    "autoestima": True,
+    
+    # Culinária Saudável
+    "receitassaudaveis": True,
+    "comidadeverdade": True,
+    "alimentacaosaudavel": True,
+    "lowcarb": True,
+    "fitfood": True,
+    
+    # Moda e Beleza
+    "modafeminina": True,
+    "lookdodia": True,
+    "fashionblogger": True,
+    "beleza": True,
+    "maquiagem": True,
 }
 
-# Tamanhos preferidos (pessoas reais geralmente são nano/micro)
-PREFERRED_SIZES = ["nano", "micro", "small"]
 
-# Prioridade de plataformas (1 = maior prioridade)
-PLATFORM_PRIORITY = {
-    "instagram": 1,
-    "tiktok": 2,
-    "youtube": 3,
+def get_active_hashtags() -> list:
+    """Retorna lista de hashtags ativas para coleta."""
+    return [tag for tag, enabled in HASHTAGS_CONFIG.items() if enabled]
+
+
+# =============================================================================
+# CRITÉRIOS DE TRIAGEM GPT
+# =============================================================================
+
+SCREENING_CRITERIA = {
+    "min_age": 25,  # Idade mínima aparente
+    "body_types": ["sobrepeso", "obeso", "plus_size", "gordo", "acima_do_peso"],
+    "target_classes": ["A", "B"],  # Classes de renda alvo
+    "nationality": "brasileiro",  # Nacionalidade
 }
 
-# Configurações de API
-API_RATE_LIMIT_DELAY = 1.0  # segundos entre chamadas de API
-MAX_RETRIES = 3
+# Prompt para triagem GPT
+SCREENING_PROMPT = """
+Você é um especialista em análise de perfis de influenciadores para campanhas de marketing de produtos de emagrecimento.
 
-# Configurações do Instagram (via variáveis de ambiente)
-# INSTAGRAM_ACCESS_TOKEN - Token de acesso da Graph API (longa duração)
-# INSTAGRAM_USER_ID - ID do usuário Instagram (página conectada)
+Analise o perfil abaixo e responda às perguntas de forma objetiva.
+
+**DADOS DO PERFIL:**
+- Nome: {name}
+- Username: @{username}
+- Plataforma: {platform}
+- Seguidores: {followers:,}
+- Taxa de Engajamento: {engagement_rate:.2f}%
+- Bio: {bio}
+- Localização: {location}
+- Descrição do conteúdo: {content_description}
+
+**PERGUNTAS DE TRIAGEM:**
+
+1. **IDADE:** A pessoa aparenta ter mais de 25 anos? (Sim/Não/Incerto)
+
+2. **TIPO CORPORAL:** A pessoa aparenta ter sobrepeso ou ser obesa? (Sim/Não/Incerto)
+   - Considere: plus size, gordo(a), acima do peso, curvy, em processo de emagrecimento
+
+3. **CLASSE SOCIAL:** O conteúdo parece ser consumido por pessoas de classe A ou B? (Sim/Não/Incerto)
+   - Considere: qualidade das fotos, locais frequentados, produtos mencionados, estilo de vida
+
+4. **NACIONALIDADE:** A pessoa é brasileira? (Sim/Não/Incerto)
+   - Considere: idioma da bio, localização, hashtags em português
+
+5. **PESSOA REAL:** É uma pessoa real (não marca, loja, clínica ou profissional vendendo serviços)? (Sim/Não)
+
+**RESPONDA APENAS NO FORMATO JSON (sem markdown, sem explicações extras):**
+{{"idade_25_plus": true, "sobrepeso_obeso": true, "classe_ab": true, "brasileiro": true, "pessoa_real": true, "aprovado": true, "motivo": "Breve explicação", "confianca": 85}}
+
+**REGRAS:**
+- "aprovado" = true APENAS se TODAS as condições forem verdadeiras
+- Use true/false (não null)
+- Se houver dúvida significativa em qualquer critério, marque como false
+- "confianca" é um número de 0 a 100
+"""
+
+# =============================================================================
+# CONFIGURAÇÕES DE API
+# =============================================================================
+
+# TikTok API (via RapidAPI - Manus)
+MANUS_API_BASE = "https://api.manus.ai"
+
+# Instagram Graph API
+INSTAGRAM_API_BASE = "https://graph.facebook.com/v18.0"
+
+# OpenAI API
+OPENAI_MODEL = "gpt-4.1-mini"
+OPENAI_MAX_TOKENS = 500
+OPENAI_TEMPERATURE = 0.1
+
+# =============================================================================
+# RATE LIMITING
+# =============================================================================
+
+API_DELAYS = {
+    "tiktok": 2.0,  # segundos entre requisições
+    "instagram": 1.0,
+    "youtube": 1.0,
+    "openai": 1.0,
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "username": "mayaborges_",
+    "name": "Maya Borges",
+    "approved": true,
+    "screening": {
+      "idade_25_plus": true,
+      "sobrepeso_obeso": true,
+      "classe_ab": true,
+      "brasileiro": true,
+      "pessoa_real": true,
+      "aprovado": true,
+      "motivo": "Perfil de mulher adulta brasileira, em processo de emagrecimento, com conteúdo de qualidade e engajamento relevante, indicando público classe A/B.",
+      "confianca": 90
+    }
+  },
+  {
+    "username": "flufranco",
+    "name": "Flu Franco",
+    "approved": false,
+    "screening": {
+      "idade_25_plus": true,
+      "sobrepeso_obeso": true,
+      "classe_ab": false,
+      "brasileiro": true,
+      "pessoa_real": true,
+      "aprovado": false,
+      "motivo": "Embora o perfil seja de uma pessoa real, brasileira, plus size e provavelmente acima de 25 anos, não há evidências claras de que o público seja de classe A ou B, o que impede aprovação total.",
+      "confianca": 80
+    }
+  },
+  {
+    "username": "fitstore_oficial",
+    "name": "Fit Store",
+    "approved": false,
+    "screening": {
+      "idade_25_plus": false,
+      "sobrepeso_obeso": false,
+      "classe_ab": false,
+      "brasileiro": true,
+      "pessoa_real": false,
+      "aprovado": false,
+      "motivo": "Perfil é de uma loja de suplementos, não de uma pessoa real; não há informações visuais para avaliar idade, tipo corporal ou classe social.",
+      "confianca": 90
+    }
+  },
+  {
+    "username": "carol_emagrece",
+    "name": "Carol Silva",
+    "approved": false,
+    "screening": {
+      "idade_25_plus": true,
+      "sobrepeso_obeso": true,
+      "classe_ab": false,
+      "brasileiro": true,
+      "pessoa_real": true,
+      "aprovado": false,
+      "motivo": "Embora a influenciadora seja real, brasileira, maior de 25 anos e em processo de emagrecimento, o conteúdo não indica claramente consumo por classe A ou B.",
+      "confianca": 90
+    }
+  },
+  {
+    "username": "drnutri_joao",
+    "name": "Dr. João Nutricionista",
+    "approved": false,
+    "screening": {
+      "idade_25_plus": true,
+      "sobrepeso_obeso": false,
+      "classe_ab": true,
+      "brasileiro": true,
+      "pessoa_real": true,
+      "aprovado": false,
+      "motivo": "O influenciador aparenta não ter sobrepeso ou obesidade, o que não atende ao critério para aprovação.",
+      "confianca": 90
+    }
+  },
+  {
+    "username": "gordinha_fashion",
+    "name": "Ana Paula",
+    "approved": false,
+    "screening": {
+      "idade_25_plus": true,
+      "sobrepeso_obeso": true,
+      "classe_ab": false,
+      "brasileiro": true,
+      "pessoa_real": true,
+      "aprovado": false,
+      "motivo": "Classe social provável não A ou B, baseado no conteúdo e estilo de vida apresentados",
+      "confianca": 90
+    }
+  }
+]
