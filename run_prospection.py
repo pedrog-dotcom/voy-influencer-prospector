@@ -344,9 +344,15 @@ def main():
     else:
         result = pipeline.run_full_pipeline()
         
-        # Imprimir resultado para GitHub Actions
-        print(f"\n::set-output name=approved::{result['new_approved']}")
-        print(f"::set-output name=total_today::{result['total_approved_today']}")
+        # Imprimir resultado para GitHub Actions (usando Environment Files)
+        github_output = os.environ.get('GITHUB_OUTPUT')
+        if github_output:
+            with open(github_output, 'a') as f:
+                f.write(f"approved={result['new_approved']}\n")
+                f.write(f"total_today={result['total_approved_today']}\n")
+        else:
+            # Fallback para execução local
+            print(f"\nResultado: {result['new_approved']} aprovados, {result['total_approved_today']} total hoje")
 
 
 if __name__ == "__main__":
