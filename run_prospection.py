@@ -3,18 +3,17 @@
 Voy Saúde - Sistema de Prospecção de Influenciadores V4
 
 Fluxo otimizado:
-1. Coleta perfis via hashtags (TikTok, Instagram, YouTube)
+1. Coleta perfis via hashtags (Instagram)
 2. Filtra por 10k+ seguidores e 2.5%+ engajamento
 3. Verifica histórico para não reprocessar perfis (economia de tokens)
 4. Triagem GPT: idade 25+, sobrepeso/obeso, classe A/B, brasileiro
 5. Salva 20 aprovados por dia em CSV
 
 Uso:
-    python run_prospection.py [--collect] [--screen] [--all]
+    python run_prospection.py [--collect] [--screen]
     
     --collect: Apenas coleta novos perfis
     --screen: Apenas faz triagem dos pendentes
-    --all: Executa fluxo completo (padrão)
 """
 
 import os
@@ -75,8 +74,8 @@ class ProspectionPipeline:
         
         active_hashtags = get_active_hashtags()
         logger.info(f"Hashtags ativas: {len(active_hashtags)}")
-        logger.info(f"Critérios sugeridos: {MIN_FOLLOWERS:,}+ seguidores, {MIN_ENGAGEMENT_RATE}%+ engajamento")
-        logger.info("NOTA: Todos os perfis serão salvos para triagem GPT (filtro flexível)")
+        logger.info(f"Critérios: {MIN_FOLLOWERS:,}+ seguidores, {MIN_ENGAGEMENT_RATE}%+ engajamento")
+        logger.info("NOTA: Apenas perfis qualificados serão enviados para triagem GPT")
         
         # Coletar perfis (retorna todos, não apenas qualificados)
         collected = collect_profiles_from_hashtags(max_per_hashtag)
@@ -85,7 +84,7 @@ class ProspectionPipeline:
             logger.warning("Nenhum perfil coletado das hashtags")
             return 0
         
-        # Converter para dict - TODOS os perfis, não apenas qualificados
+        # Converter para dict - apenas perfis qualificados
         profiles_data = [p.to_dict() for p in collected]
         logger.info(f"Total de perfis coletados: {len(profiles_data)}")
         
@@ -320,13 +319,6 @@ def main():
         type=int,
         default=None,
         help="Alias para --target (compatibilidade)"
-    )
-    parser.add_argument(
-        "--output-format",
-        type=str,
-        default="all",
-        choices=["json", "csv", "markdown", "all"],
-        help="Formato de saída (padrão: all)"
     )
     
     args = parser.parse_args()

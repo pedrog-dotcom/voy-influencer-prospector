@@ -4,14 +4,14 @@ Sistema automatizado de prospecção diária de influenciadores para a marca [Vo
 
 ## 📋 Descrição
 
-Este projeto automatiza a busca e qualificação de influenciadores nas plataformas **Instagram** (prioritário), **TikTok** e **YouTube**, utilizando **análise de IA (GPT)** para identificar pessoas reais e filtrar páginas comerciais.
+Este projeto automatiza a busca e qualificação de influenciadores no **Instagram** (via Graph API), utilizando **análise de IA (GPT)** para identificar pessoas reais e filtrar páginas comerciais.
 
 ### Foco Principal
 
 - **Pessoas reais** compartilhando suas jornadas de vida
 - **Sobrepeso/obesidade** ou processo de emagrecimento
 - **Plus size**, lifestyle, autocuidado, culinária saudável
-- **Nano/micro influenciadores** (1k-50k seguidores) - mais autênticos
+- **Micro influenciadores** (10k+ seguidores) - mais autênticos
 
 ### O que evitamos
 
@@ -24,12 +24,10 @@ Este projeto automatiza a busca e qualificação de influenciadores nas platafor
 
 - ✅ **Análise com IA (GPT)** para identificar pessoas reais
 - ✅ Busca automatizada no **Instagram** (via Graph API)
-- ✅ Busca automatizada no **TikTok** e **YouTube**
 - ✅ Cálculo de taxa de engajamento
-- ✅ Filtro por palavras-chave expandidas (lifestyle, plus size, autocuidado)
-- ✅ Controle de histórico para evitar duplicatas
-- ✅ Exportação em múltiplos formatos (JSON, CSV, Markdown)
-- ✅ Geração de relatórios detalhados
+- ✅ Filtro por hashtags configuráveis (lifestyle, plus size, autocuidado)
+- ✅ Controle de histórico para evitar duplicatas e economizar tokens
+- ✅ Registro incremental em CSV dos aprovados
 - ✅ Execução agendada via GitHub Actions (diariamente às 9h)
 
 ## 🤖 Análise com IA
@@ -38,10 +36,11 @@ O sistema utiliza GPT para analisar cada perfil e determinar:
 
 | Critério | Descrição |
 |----------|-----------|
-| **Tipo de perfil** | Pessoa real, comercial, profissional |
+| **Idade** | Se aparenta ter mais de 25 anos |
 | **Tipo corporal** | Sobrepeso, obeso, plus size, jornada de emagrecimento |
-| **Autenticidade** | Score de 0-100 |
-| **Potencial de parceria** | Score de 0-100 |
+| **Classe social** | Conteúdo consumido por classe A/B |
+| **Nacionalidade** | Indicadores de perfil brasileiro |
+| **Pessoa real** | Não ser marca/loja/serviço |
 | **Recomendação** | Se o perfil é adequado para parceria |
 
 ### Exemplo de Resultado
@@ -56,8 +55,6 @@ Análise: Perfil parece ser de pessoa real com indicadores de jornada de emagrec
 | Plataforma | Prioridade | Método de Busca |
 |------------|------------|-----------------|
 | Instagram | 1 (Alta) | Graph API - Business Discovery |
-| TikTok | 2 (Média) | API de busca de vídeos |
-| YouTube | 3 (Baixa) | API de busca de canais |
 
 ## 📁 Estrutura do Projeto
 
@@ -66,15 +63,13 @@ voy-influencer-prospector/
 ├── src/
 │   ├── __init__.py
 │   ├── config.py               # Configurações e palavras-chave expandidas
-│   ├── models.py               # Modelos de dados
 │   ├── history_manager.py      # Gerenciamento de histórico
-│   ├── profile_analyzer.py     # 🆕 Análise de perfis com IA (GPT)
-│   ├── instagram_prospector.py # Prospecção do Instagram
-│   ├── prospector_v3.py        # 🆕 Lógica principal V3 com IA
-│   └── report_generator.py     # Geração de relatórios
+│   ├── gpt_screener.py          # Triagem de perfis com IA (GPT)
+│   └── hashtag_collector.py     # Coleta de perfis via hashtags
 ├── data/
-│   ├── prospected_influencers.json  # Histórico de influenciadores
-│   └── prospects_YYYY-MM-DD.*       # Resultados diários
+│   ├── approved_influencers.csv     # Influenciadores aprovados
+│   ├── processed_profiles.json      # Histórico de perfis processados
+│   └── pending_profiles.json        # Perfis aguardando triagem
 ├── logs/
 │   └── prospection_YYYYMMDD.log     # Logs de execução
 ├── .github/
@@ -129,9 +124,6 @@ python run_prospection.py
 # Especificar quantidade
 python run_prospection.py --count 30
 
-# Exportar em todos os formatos
-python run_prospection.py --output-format all
-
 # Modo verboso
 python run_prospection.py --verbose
 ```
@@ -140,43 +132,13 @@ python run_prospection.py --verbose
 
 | Opção | Descrição | Padrão |
 |-------|-----------|--------|
-| `--count N` | Número de influenciadores a prospectar | 20 |
-| `--output-format` | Formato de saída (json, csv, markdown, all) | all |
+| `--count N` | Número de influenciadores a aprovar | 20 |
 | `--verbose` | Modo verboso com mais detalhes | False |
 
-## 📊 Formatos de Saída
+## 📊 Saída Principal
 
-### JSON
-```json
-{
-  "date": "2026-01-18",
-  "influencers": [
-    {
-      "name": "Aline_Brumatti",
-      "primary_platform": "tiktok",
-      "profiles": [
-        {
-          "platform": "tiktok",
-          "username": "alinebrumatti",
-          "url": "https://www.tiktok.com/@alinebrumatti",
-          "followers": 12300,
-          "engagement_rate": 9.99
-        }
-      ],
-      "bio": "✨Minha vida real✨ 🏋🏻‍♀️Processo de emagrecimento",
-      "notes": "✓ Pessoa real | ✓ Jornada de emagrecimento"
-    }
-  ],
-  "total_found": 61,
-  "total_qualified": 33
-}
-```
-
-### CSV
-Arquivo com colunas: Nome, Plataforma, Username, URL, Seguidores, Engajamento, Pessoa Real, Jornada de Peso, etc.
-
-### Markdown
-Relatório formatado com tabelas e detalhes de cada influenciador.
+### CSV (Aprovados)
+Arquivo com colunas: Nome, Plataforma, Username, URL, Seguidores, Engajamento, Pessoa Real, Jornada de Peso, etc. O arquivo é incrementado a cada execução.
 
 ## 🔄 Automação (GitHub Actions)
 
@@ -198,56 +160,30 @@ Siga as instruções detalhadas em [SETUP_GITHUB.md](SETUP_GITHUB.md) para:
 | `INSTAGRAM_ACCESS_TOKEN` | Token de acesso da Graph API do Instagram |
 | `INSTAGRAM_USER_ID` | ID da página do Instagram |
 
-## 📈 Palavras-chave de Busca
+## 📈 Hashtags Monitoradas
 
-### Jornada Pessoal
-- minha jornada, minha transformação, meu antes e depois
-- diário de emagrecimento, perdendo peso, mudança de vida
-
-### Plus Size / Body Positive
-- moda plus size, curvy fashion, gordasestilosas
-- body positive, todas as curvas, gordinha fashion
-
-### Lifestyle
-- vida saudável, rotina saudável, hábitos saudáveis
-- qualidade de vida, bem estar, saúde mental
-
-### Autocuidado
-- autocuidado, self care, amor próprio
-- autoestima, empoderamento, confiança
-
-### Culinária
-- receitas saudáveis, comida de verdade
-- alimentação saudável, low carb, reeducação alimentar
-
-### Medicamentos (experiências pessoais)
-- ozempic, semaglutida, mounjaro, wegovy
+As hashtags ativas ficam em `src/config.py` dentro de `HASHTAGS_CONFIG`.
 
 ## 🎯 Critérios de Qualificação
 
 | Critério | Requisito |
 |----------|-----------|
+| Seguidores | ≥ 10.000 |
 | Taxa de Engajamento | ≥ 2,5% |
 | Tipo de Perfil | Pessoa real (validado por IA) |
-| Tamanho Preferido | Nano/Micro (1k-50k seguidores) |
-| Plataformas | Instagram (prioritário), TikTok, YouTube |
+| Plataforma | Instagram |
 | Nicho | Emagrecimento, plus size, lifestyle, autocuidado |
 | Histórico | Não prospectado anteriormente |
 
 ## 🔧 Manutenção
 
-### Expandir Lista de Influenciadores do Instagram
+### Expandir Lista de Influenciadores Seed do Instagram
 
-Edite `src/prospector_v3.py` e adicione usernames à lista `SEED_INFLUENCERS_REAL`.
+Edite `src/hashtag_collector.py` e adicione usernames à lista `SEED_PROFILES`.
 
-### Adicionar Novas Palavras-chave
+### Adicionar/Remover Hashtags
 
-Edite `src/config.py` e adicione às listas correspondentes:
-- `SEARCH_KEYWORDS_JOURNEY` - Jornada pessoal
-- `SEARCH_KEYWORDS_LIFESTYLE` - Lifestyle
-- `SEARCH_KEYWORDS_FASHION` - Moda plus size
-- `SEARCH_KEYWORDS_SELFCARE` - Autocuidado
-- `SEARCH_KEYWORDS_FOOD` - Culinária
+Edite `src/config.py` e marque as hashtags desejadas como `True`/`False` no dicionário `HASHTAGS_CONFIG`.
 
 ### Renovar Token do Instagram
 

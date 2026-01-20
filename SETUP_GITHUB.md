@@ -55,16 +55,6 @@ on:
         required: false
         default: '20'
         type: string
-      output_format:
-        description: 'Formato de saida'
-        required: false
-        default: 'all'
-        type: choice
-        options:
-          - json
-          - csv
-          - markdown
-          - all
 
 env:
   PYTHON_VERSION: '3.11'
@@ -102,9 +92,8 @@ jobs:
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
         run: |
           COUNT=${{ github.event.inputs.count || '20' }}
-          FORMAT=${{ github.event.inputs.output_format || 'all' }}
-          echo "Running prospection with count=$COUNT and format=$FORMAT"
-          python run_prospection.py --count $COUNT --output-format $FORMAT
+          echo "Running prospection with count=$COUNT"
+          python run_prospection.py --count $COUNT
           echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
@@ -112,9 +101,10 @@ jobs:
         with:
           name: prospection-results-${{ steps.prospection.outputs.date }}
           path: |
-            data/prospects_*.json
-            data/prospects_*.csv
-            data/prospects_*.md
+            data/approved_influencers.csv
+            data/processed_profiles.json
+            data/pending_profiles.json
+            data/execution_results.json
           retention-days: 30
 
       - name: Commit and push results
@@ -134,16 +124,18 @@ jobs:
           DATE=$(date +%Y-%m-%d)
           echo "## Prospeccao de Influenciadores - $DATE" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f "data/prospects_$DATE.json" ]; then
+          if [ -f "data/execution_results.json" ]; then
             python3 -c "
           import json
-          with open('data/prospects_$DATE.json') as f:
+          with open('data/execution_results.json') as f:
               data = json.load(f)
+          latest = data[-1] if data else {}
           print('| Metrica | Valor |')
           print('|---------|-------|')
-          print(f'| Total Encontrados | {data.get(\"total_found\", 0)} |')
-          print(f'| Total Qualificados | {data.get(\"total_qualified\", 0)} |')
-          print(f'| Selecionados | {len(data.get(\"influencers\", []))} |')
+          print(f'| Novos aprovados | {latest.get(\"new_approved\", 0)} |')
+          print(f'| Total aprovados hoje | {latest.get(\"total_approved_today\", 0)} |')
+          print(f'| Perfis analisados | {latest.get(\"profiles_analyzed\", 0)} |')
+          print(f'| Pendentes | {latest.get(\"pending_profiles\", 0)} |')
           " >> $GITHUB_STEP_SUMMARY
           else
             echo "Arquivo de resultados nao encontrado" >> $GITHUB_STEP_SUMMARY
@@ -193,14 +185,15 @@ O workflow está configurado para executar automaticamente:
 
 A cada execução, o sistema:
 
-1. **Busca perfis** no Instagram, TikTok e YouTube
-2. **Analisa cada perfil com GPT** para determinar:
-   - Se é uma pessoa real ou página comercial
-   - Se tem sobrepeso/obesidade ou está em jornada de emagrecimento
-   - Score de autenticidade (0-100)
-   - Potencial de parceria (0-100)
-3. **Filtra e prioriza** pessoas reais com alto potencial
-4. **Gera relatórios** em múltiplos formatos
+1. **Busca perfis** no Instagram via hashtags e perfis seed
+2. **Filtra** perfis com 10k+ seguidores e 2,5%+ de engajamento
+3. **Analisa cada perfil com GPT** para determinar:
+   - Se é uma pessoa real
+   - Se aparenta ter 25+ anos
+   - Se aparenta sobrepeso/obesidade
+   - Se o conteúdo é consumido por classe A/B
+   - Se aparenta ser brasileiro
+3. **Registra** aprovados em CSV e mantém histórico para não reprocessar
 
 ## Formatos de Saída
 
@@ -208,9 +201,10 @@ A cada execução, os seguintes arquivos são gerados:
 
 | Arquivo | Descrição |
 |---------|-----------|
-| `prospects_YYYY-MM-DD.json` | Dados completos em JSON |
-| `prospects_YYYY-MM-DD.csv` | Planilha para Excel/Sheets |
-| `prospects_YYYY-MM-DD.md` | Relatório em Markdown |
+| `approved_influencers.csv` | Planilha com aprovados (incremental) |
+| `processed_profiles.json` | Histórico de perfis analisados |
+| `pending_profiles.json` | Perfis coletados aguardando triagem |
+| `execution_results.json` | Resumo das execuções recentes |
 
 ## Solução de Problemas
 
@@ -244,7 +238,8 @@ A API do Instagram só retorna dados de perfis **Business** ou **Creator**. Perf
 
 Se a IA está filtrando muitos perfis:
 - Verifique os logs para entender os motivos
-- Ajuste o `min_partnership_potential` em `prospector_v3.py` se necessário
+- Ajuste as hashtags em `src/config.py`
+- Adicione perfis seed em `src/hashtag_collector.py`
 
 ## Custos
 

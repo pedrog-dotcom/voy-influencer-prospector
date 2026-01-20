@@ -6,7 +6,7 @@ Estratégia:
 1. Usar Instagram Graph API para buscar mídias por hashtag
 2. Usar Business Discovery para obter métricas dos perfis
 3. Manter lista de perfis seed do nicho para garantir resultados
-4. Salvar TODOS os perfis coletados (mesmo sem engajamento) para triagem posterior
+4. Enviar apenas perfis qualificados (10k+ seguidores e 2.5%+ engajamento) para triagem GPT
 """
 
 import os
@@ -148,7 +148,7 @@ class HashtagCollector:
             max_per_hashtag: Máximo de perfis por hashtag
             
         Returns:
-            Lista de perfis coletados que atendem aos critérios
+            Lista de perfis coletados que atendem aos critérios mínimos
         """
         all_profiles = []
         
@@ -193,11 +193,11 @@ class HashtagCollector:
         qualified = [p for p in all_profiles if p.meets_criteria()]
         logger.info(f"\nTotal coletado: {len(all_profiles)}")
         logger.info(f"Qualificados (10k+, 2.5%+): {len(qualified)}")
-        logger.info(f"Retornando TODOS os perfis para triagem GPT")
+        logger.info("Retornando apenas perfis qualificados para triagem GPT")
         
-        # Retornar TODOS os perfis (filtro será feito pelo GPT)
+        # Retornar apenas perfis qualificados
         # Ordenar por seguidores para priorizar maiores
-        sorted_profiles = sorted(all_profiles, key=lambda x: x.followers, reverse=True)
+        sorted_profiles = sorted(qualified, key=lambda x: x.followers, reverse=True)
         
         return sorted_profiles
     
