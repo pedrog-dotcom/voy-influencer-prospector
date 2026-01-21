@@ -19,6 +19,7 @@ PENDING_FILE = DATA_DIR / "pending_profiles.json"  # Perfis coletados aguardando
 DAILY_OUTPUT_COUNT = 20  # Número de influenciadores aprovados por dia
 MIN_FOLLOWERS = 10000  # Mínimo de seguidores (10k)
 MIN_ENGAGEMENT_RATE = 2.5  # Taxa de engajamento mínima (%)
+RECENT_MEDIA_DAYS = 30  # Janela de recência para posts com hashtag
 
 # =============================================================================
 # HASHTAGS PARA COLETA DE PERFIS
