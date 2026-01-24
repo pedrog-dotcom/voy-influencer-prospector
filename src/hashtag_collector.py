@@ -13,16 +13,15 @@ import os
 import time
 import logging
 import requests
-import re
 from typing import List, Dict, Optional, Set
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 from config import (
     get_active_hashtags,
     MIN_FOLLOWERS,
     MIN_ENGAGEMENT_RATE,
-    API_DELAYS,
+    RECENT_MEDIA_DAYS,
     INSTAGRAM_API_BASE,
 )
 
@@ -254,7 +253,7 @@ class HashtagCollector:
             media_url = f"{INSTAGRAM_API_BASE}/{hashtag_id}/recent_media"
             media_params = {
                 "user_id": self.instagram_user_id,
-                "fields": "id,caption,permalink",
+                "fields": "id,caption,permalink,timestamp,media_type,username",
                 "limit": min(max_results * 2, 50),
                 "access_token": self.instagram_token
             }
@@ -266,15 +265,32 @@ class HashtagCollector:
             
             media_data = response.json().get("data", [])
             
-            # Extrair usernames das captions e permalinks
+            # Extrair usernames das mídias recentes (vídeos)
             usernames_found = set()
+            cutoff = datetime.now(timezone.utc)
+            cutoff = cutoff.replace(microsecond=0) - timedelta(days=RECENT_MEDIA_DAYS)
+            valid_media_types = {"VIDEO", "REELS"}
             
             for media in media_data:
-                caption = media.get("caption", "")
-                
-                # Extrair menções da caption
-                mentions = re.findall(r'@([a-zA-Z0-9_.]+)', caption)
-                usernames_found.update(mentions)
+                timestamp_str = media.get("timestamp")
+                if not timestamp_str:
+                    continue
+
+                try:
+                    media_time = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+                except ValueError:
+                    continue
+
+                if media_time < cutoff:
+                    continue
+
+                media_type = media.get("media_type", "")
+                if media_type not in valid_media_types:
+                    continue
+
+                username = media.get("username", "")
+                if username:
+                    usernames_found.add(username)
             
             # Buscar dados de cada username encontrado
             for username in list(usernames_found)[:max_results]:
