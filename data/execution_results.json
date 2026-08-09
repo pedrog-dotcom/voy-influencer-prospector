@@ -1,18 +1,5 @@
 [
   {
-    "execution_date": "2026-07-10",
-    "execution_time": "14:12:48",
-    "duration_seconds": 42.74,
-    "new_profiles_collected": 0,
-    "profiles_analyzed": 0,
-    "new_approved": 0,
-    "total_approved_today": 0,
-    "total_processed_all_time": 70,
-    "total_approved_all_time": 7,
-    "pending_profiles": 0,
-    "status": "sem_pendentes"
-  },
-  {
     "execution_date": "2026-07-11",
     "execution_time": "13:08:49",
     "duration_seconds": 37.95,
@@ -380,6 +367,19 @@
     "execution_date": "2026-08-08",
     "execution_time": "12:37:55",
     "duration_seconds": 40.23,
+    "new_profiles_collected": 0,
+    "profiles_analyzed": 0,
+    "new_approved": 0,
+    "total_approved_today": 0,
+    "total_processed_all_time": 70,
+    "total_approved_all_time": 7,
+    "pending_profiles": 0,
+    "status": "sem_pendentes"
+  },
+  {
+    "execution_date": "2026-08-09",
+    "execution_time": "12:39:50",
+    "duration_seconds": 44.39,
     "new_profiles_collected": 0,
     "profiles_analyzed": 0,
     "new_approved": 0,
